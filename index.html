@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Central de Atendimento — Strada</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#1a3a5c;--brand-mid:#2563a8;--brand-light:#dbeafe;--accent:#e85d26;
+  --surface:#f8f9fb;--surface-2:#ffffff;--border:#e2e6ec;
+  --text:#0f1923;--text-2:#4b5a6e;--text-3:#8a97a8;
+  --success:#16a34a;--success-bg:#dcfce7;
+  --error:#dc2626;--error-bg:#fee2e2;
+  --warn-bg:#fffbeb;--warn:#b45309;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.05);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+header{background:var(--brand);padding:0 2.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px;color:#fff;font-size:15px;font-weight:600}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:18px;height:18px;fill:#fff}
+.header-badge{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.18)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);padding:2rem 2.5rem 0;text-align:center;color:#fff}
+.hero-label{display:inline-block;background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:.6rem}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(24px,4vw,36px);font-weight:400;line-height:1.15;margin-bottom:.5rem}
+.hero h1 em{font-style:italic;color:#fbbf24}
+.hero p{font-size:14px;color:rgba(255,255,255,.75);max-width:480px;margin:0 auto .1rem;line-height:1.6}
+
+/* TABS NAV */
+.tabs-nav{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);display:flex;justify-content:center;padding:0 2rem;gap:0}
+.tab-btn{padding:.85rem 1.75rem;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,.6);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px}
+.tab-btn svg{width:15px;height:15px;fill:currentColor;opacity:.7}
+.tab-btn:hover{color:rgba(255,255,255,.9)}
+.tab-btn.active{color:#fff;border-bottom-color:#fbbf24;font-weight:600}
+.tab-btn.active svg{opacity:1}
+
+/* STEPS BAR */
+.steps-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 2.5rem;display:flex;justify-content:center}
+.steps{display:flex;max-width:640px;width:100%}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;padding:.8rem .5rem;gap:5px;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;top:20px;right:-50%;width:100%;height:2px;background:var(--border);z-index:0}
+.step.done:not(:last-child)::after{background:var(--brand-mid)}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--border);color:var(--text-3);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;transition:all .3s}
+.step.active .step-num{background:var(--brand-mid);color:#fff}
+.step.done .step-num{background:var(--success);color:#fff}
+.step-label{font-size:11px;color:var(--text-3);font-weight:500;text-align:center}
+.step.active .step-label{color:var(--brand-mid)}
+.step.done .step-label{color:var(--success)}
+
+/* MAIN */
+main{flex:1;padding:2rem 1.5rem 4rem;display:flex;justify-content:center}
+.form-wrapper{width:100%;max-width:700px}
+
+/* PANELS */
+.panel{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.25rem;animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.panel-header{padding:.9rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:#fafbfc}
+.panel-icon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.panel-icon svg{width:15px;height:15px}
+.panel-icon.blue{background:var(--brand-light)}.panel-icon.blue svg{fill:var(--brand-mid)}
+.panel-icon.orange{background:#fff3e0}.panel-icon.orange svg{fill:#e65100}
+.panel-icon.green{background:#e8f5e9}.panel-icon.green svg{fill:#2e7d32}
+.panel-icon.purple{background:#f3e8ff}.panel-icon.purple svg{fill:#7c3aed}
+.panel-icon.teal{background:#e0f2fe}.panel-icon.teal svg{fill:#0369a1}
+.panel-header h2{font-size:14px;font-weight:600;color:var(--text)}
+.panel-header span{font-size:12px;color:var(--text-3);margin-left:auto}
+.panel-body{padding:1.5rem}
+
+/* FIELDS */
+.field{margin-bottom:1rem}
+.field:last-child{margin-bottom:0}
+label{display:block;font-size:13px;font-weight:500;color:var(--text-2);margin-bottom:5px}
+label .req{color:var(--accent);margin-left:2px}
+label .hint{font-weight:400;color:var(--text-3);font-size:12px;margin-left:4px}
+input[type=text],input[type=email],input[type=tel],select,textarea{
+  width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fff;
+  transition:border-color .2s,box-shadow .2s;outline:none;appearance:none
+}
+input:focus,select:focus,textarea:focus{border-color:var(--brand-mid);box-shadow:0 0 0 3px rgba(37,99,168,.1)}
+textarea{resize:vertical;min-height:90px;line-height:1.5}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a97a8' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* PRIORITY */
+.priority-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.priority-tile{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 8px;text-align:center;cursor:pointer;transition:all .2s;background:#fff}
+.priority-tile .dot{width:10px;height:10px;border-radius:50%;margin:0 auto 6px}
+.priority-tile .pt-label{font-size:12px;font-weight:500;color:var(--text-2)}
+.priority-tile.sel-critical{border-color:#dc2626;background:#fee2e2}.priority-tile.sel-critical .pt-label{color:#dc2626}
+.priority-tile.sel-high{border-color:#ea580c;background:#fff3e0}.priority-tile.sel-high .pt-label{color:#ea580c}
+.priority-tile.sel-medium{border-color:#ca8a04;background:#fef9c3}.priority-tile.sel-medium .pt-label{color:#ca8a04}
+.priority-tile.sel-low{border-color:#16a34a;background:#dcfce7}.priority-tile.sel-low .pt-label{color:#16a34a}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:1.5rem;text-align:center;cursor:pointer;transition:all .25s;background:#fafbfc;position:relative}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--brand-mid);background:var(--brand-light)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone .uz-icon{width:40px;height:40px;background:var(--brand-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.upload-zone .uz-icon svg{width:20px;height:20px;fill:var(--brand-mid)}
+.upload-zone p{font-size:13px;color:var(--text-2);margin-bottom:4px}
+.upload-zone small{font-size:11px;color:var(--text-3)}
+#file-previews{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:12px}
+.file-preview{position:relative;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);background:#f0f2f5;aspect-ratio:1}
+.file-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.file-preview .fp-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:3px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-preview .fp-remove{position:absolute;top:4px;right:4px;width:18px;height:18px;background:rgba(0,0,0,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:#fff;font-size:11px;line-height:1}
+.file-preview.is-video .fp-thumb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#1a3a5c}
+.file-preview.is-video .fp-thumb svg{width:28px;height:28px;fill:rgba(255,255,255,.7)}
+
+/* EMAIL INFO */
+.email-info-box{background:var(--warn-bg);border:1px solid #fde68a;border-radius:var(--radius-sm);padding:10px 14px;display:flex;gap:10px;align-items:flex-start;margin-top:.75rem}
+.email-info-box svg{width:16px;height:16px;fill:var(--warn);flex-shrink:0;margin-top:1px}
+.email-info-box p{font-size:12px;color:var(--warn);line-height:1.5}
+
+/* CONFIG BOX */
+.config-box{background:var(--brand);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+.config-box>p{font-size:13px;color:rgba(255,255,255,.65);margin-bottom:.75rem;font-weight:500}
+.config-box input{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px;margin-bottom:8px}
+.config-box input::placeholder{color:rgba(255,255,255,.4)}
+.config-box input:focus{border-color:rgba(255,255,255,.6);box-shadow:none}
+.config-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* SUBMIT */
+.btn-submit{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-submit:hover{background:#c94e1e}
+.btn-submit:active{transform:scale(.98)}
+.btn-submit:disabled{background:#ccc;cursor:not-allowed;transform:none}
+.btn-submit svg{width:18px;height:18px;fill:#fff}
+#status-box{display:none;padding:12px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;margin-top:1rem;border:1px solid;animation:fadeUp .3s ease}
+#status-box.success{background:var(--success-bg);color:var(--success);border-color:#bbf7d0}
+#status-box.error{background:var(--error-bg);color:var(--error);border-color:#fecaca}
+#status-box.info{background:var(--brand-light);color:var(--brand-mid);border-color:#93c5fd}
+
+/* SUCCESS */
+#success-screen{display:none;text-align:center;padding:3rem 2rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);animation:fadeUp .4s ease}
+.success-icon{width:72px;height:72px;background:var(--success-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+.success-icon svg{width:36px;height:36px;fill:var(--success)}
+#success-screen h2{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;margin-bottom:.5rem}
+#success-screen p{color:var(--text-2);font-size:14px;line-height:1.6;max-width:420px;margin:0 auto 1rem}
+.ticket-badge{display:inline-flex;align-items:center;gap:8px;background:var(--brand-light);color:var(--brand-mid);border-radius:20px;padding:8px 18px;font-size:14px;font-weight:600;margin-bottom:1rem}
+.success-details{background:#fafbfc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;text-align:left;margin:1rem auto;max-width:400px}
+.success-details .sd-row{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
+.success-details .sd-row:last-child{border-bottom:none}
+.success-details .sd-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.success-details .sd-icon svg{width:14px;height:14px}
+.success-details .sd-label{font-size:11px;color:var(--text-3)}
+.success-details .sd-value{font-size:13px;font-weight:500;color:var(--text);margin-top:1px}
+.btn-new{padding:10px 24px;background:transparent;color:var(--brand-mid);border:1.5px solid var(--brand-mid);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-new:hover{background:var(--brand-light)}
+.board-link{display:inline-flex;align-items:center;gap:6px;color:var(--text-3);font-size:13px;text-decoration:none;margin-top:.75rem;transition:color .2s}
+.board-link:hover{color:var(--brand-mid)}
+.board-link svg{width:14px;height:14px;fill:currentColor}
+
+/* ── ACOMPANHAMENTO TAB ── */
+#tab-track{display:none}
+.search-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem;margin-bottom:1.5rem;animation:fadeUp .3s ease}
+.search-card h2{font-size:15px;font-weight:600;margin-bottom:.3rem}
+.search-card p{font-size:13px;color:var(--text-2);margin-bottom:1rem;line-height:1.5}
+.search-row{display:flex;gap:10px}
+.search-row input{flex:1}
+.btn-search{padding:10px 20px;background:var(--brand-mid);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .2s;display:flex;align-items:center;gap:6px}
+.btn-search svg{width:16px;height:16px;fill:#fff}
+.btn-search:hover{background:var(--brand)}
+.btn-search:disabled{background:#ccc;cursor:not-allowed}
+
+/* ticket cards list */
+#tickets-list{display:flex;flex-direction:column;gap:12px}
+.ticket-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;animation:fadeUp .3s ease;transition:box-shadow .2s}
+.ticket-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.1),0 8px 24px rgba(0,0,0,.07)}
+.tc-header{padding:.9rem 1.25rem;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);cursor:pointer}
+.tc-id{font-size:11px;font-weight:600;color:var(--brand-mid);background:var(--brand-light);padding:3px 9px;border-radius:20px;white-space:nowrap}
+.tc-title{font-size:14px;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tc-chevron{width:16px;height:16px;fill:var(--text-3);flex-shrink:0;transition:transform .25s}
+.ticket-card.open .tc-chevron{transform:rotate(180deg)}
+.tc-body{padding:1rem 1.25rem;display:none;border-top:1px solid var(--border);background:#fafbfc}
+.ticket-card.open .tc-body{display:block}
+
+/* status pill */
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.status-pill .sp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sp-backlog{background:#f1f5f9;color:#475569}.sp-backlog .sp-dot{background:#94a3b8}
+.sp-requested{background:#eff6ff;color:#1d4ed8}.sp-requested .sp-dot{background:#3b82f6}
+.sp-inprogress{background:#fef9c3;color:#854d0e}.sp-inprogress .sp-dot{background:#eab308}
+.sp-done{background:#dcfce7;color:#166534}.sp-done .sp-dot{background:#22c55e}
+.sp-unknown{background:#f3f4f6;color:#6b7280}.sp-unknown .sp-dot{background:#9ca3af}
+
+/* ticket detail rows */
+.td-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:1rem}
+.td-item .td-label{font-size:11px;color:var(--text-3);margin-bottom:2px}
+.td-item .td-val{font-size:13px;font-weight:500;color:var(--text)}
+.tc-desc{font-size:13px;color:var(--text-2);line-height:1.6;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:.75rem;white-space:pre-wrap;max-height:160px;overflow-y:auto}
+.tc-actions{display:flex;gap:8px;flex-wrap:wrap}
+.tc-actions a,.tc-actions button{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--radius-sm);text-decoration:none;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:#fff;color:var(--text-2);font-family:'DM Sans',sans-serif}
+.tc-actions a:hover,.tc-actions button:hover{background:var(--brand-light);color:var(--brand-mid);border-color:var(--brand-mid)}
+.tc-actions svg{width:13px;height:13px;fill:currentColor}
+
+/* kanban mini progress */
+.kanban-track{display:flex;align-items:center;gap:0;margin-bottom:1rem}
+.kt-step{flex:1;text-align:center;position:relative}
+.kt-step:not(:last-child)::after{content:'';position:absolute;top:10px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.kt-step.done:not(:last-child)::after{background:var(--success)}
+.kt-step.active:not(:last-child)::after{background:linear-gradient(to right,var(--brand-mid),var(--border))}
+.kt-dot{width:20px;height:20px;border-radius:50%;background:var(--border);margin:0 auto 4px;position:relative;z-index:1;display:flex;align-items:center;justify-content:center}
+.kt-step.done .kt-dot{background:var(--success)}
+.kt-step.active .kt-dot{background:var(--brand-mid);box-shadow:0 0 0 3px rgba(37,99,168,.2)}
+.kt-dot svg{width:10px;height:10px;fill:#fff}
+.kt-label{font-size:10px;color:var(--text-3);font-weight:500}
+.kt-step.active .kt-label{color:var(--brand-mid)}
+.kt-step.done .kt-label{color:var(--success)}
+
+/* empty & loading states */
+.state-box{text-align:center;padding:3rem 2rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);animation:fadeUp .3s ease}
+.state-box .sb-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.state-box h3{font-size:16px;font-weight:600;margin-bottom:.4rem}
+.state-box p{font-size:13px;color:var(--text-2);line-height:1.5;max-width:300px;margin:0 auto}
+.skeleton{background:linear-gradient(90deg,#f0f2f5 25%,#e2e6ec 50%,#f0f2f5 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;height:14px;margin-bottom:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* MISC */
+footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size:12px;color:rgba(255,255,255,.45)}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-dark{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--brand-mid);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+.progress-bar-wrap{background:rgba(255,255,255,.2);border-radius:4px;height:4px;margin-top:8px;overflow:hidden;display:none}
+.progress-bar{height:100%;background:#fff;border-radius:4px;width:0%;transition:width .3s ease}
+
+@media(max-width:600px){
+  header{padding:0 1rem}
+  .hero{padding:1.5rem 1rem 0}
+  .priority-grid{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+  .config-row{grid-template-columns:1fr}
+  .td-grid{grid-template-columns:1fr}
+  .search-row{flex-direction:column}
+  .kanban-track .kt-label{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    Central de Atendimento
+  </div>
+  <span class="header-badge">Powered by Businessmap</span>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-label">Squad Foundation · Strada</span>
+  <h1>Central de <em>Atendimento</em></h1>
+  <p>Abra chamados e acompanhe o status em tempo real — tudo integrado ao Businessmap.</p>
+</div>
+
+<!-- TABS NAV -->
+<div class="tabs-nav">
+  <button class="tab-btn active" id="tab-btn-form" onclick="switchTab('form')">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Abrir Chamado
+  </button>
+  <button class="tab-btn" id="tab-btn-track" onclick="switchTab('track')">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Acompanhar Chamados
+  </button>
+  <button class="tab-btn" id="tab-btn-config" onclick="openConfig()" style="margin-left:auto;opacity:.7;font-size:12px">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Configurar
+  </button>
+</div>
+
+<!-- STEPS (only form tab) -->
+<div class="steps-bar" id="steps-bar">
+  <div class="steps">
+    <div class="step active" id="step-1"><div class="step-num">1</div><div class="step-label">Identificação</div></div>
+    <div class="step" id="step-2"><div class="step-num">2</div><div class="step-label">Chamado</div></div>
+    <div class="step" id="step-3"><div class="step-num">3</div><div class="step-label">Evidências</div></div>
+    <div class="step" id="step-4"><div class="step-num">4</div><div class="step-label">Enviado</div></div>
+  </div>
+</div>
+
+<main>
+  <!-- ── SETUP BANNER — Azure Function ── -->
+  <div id="setup-banner" style="display:none;background:#1e3a5f;border-bottom:1px solid #2563a8;padding:1rem 1.5rem;gap:12px;flex-direction:column;position:relative;z-index:50">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="width:32px;height:32px;background:#0078d4;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <p style="color:#fff;font-size:13px;font-weight:600;margin-bottom:2px">&#9881; Configuração — Cloudflare Worker (proxy)</p>
+        <p style="color:rgba(255,255,255,.65);font-size:12px;line-height:1.5">Cole a URL do Cloudflare Worker abaixo. Feito <strong style="color:#fbbf24">uma única vez</strong> pelo admin.</p>
+      </div>
+      <button onclick="document.getElementById('setup-banner').style.display='none'" style="background:transparent;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:4px;line-height:1">&#x2715;</button>
+    </div>
+    <div>
+      <label style="color:rgba(255,255,255,.7);font-size:11px;display:block;margin-bottom:4px">URL do Cloudflare Worker <span style="color:#f87171">*</span></label>
+      <input type="url" id="setup-create-url" placeholder="https://strada-businessmap-proxy.isabele-aquino.workers.dev" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:12px;padding:8px 10px;border-radius:6px;font-family:monospace"/>
+    </div>
+    <input type="hidden" id="setup-search-url" value=""/>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button onclick="saveFlowUrls()" style="padding:8px 20px;background:#f6821f;color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Salvar e ativar</button>
+      <a href="https://workers.cloudflare.com" target="_blank" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:underline">Abrir Cloudflare Workers &#8594;</a>
+      <span id="setup-saved-msg" style="display:none;color:#4ade80;font-size:12px">&#10003; Salvo!</span>
+    </div>
+    <details style="margin-top:4px">
+      <summary style="color:rgba(255,255,255,.5);font-size:11px;cursor:pointer">Ver passo a passo do deploy</summary>
+      <div style="background:rgba(0,0,0,.25);border-radius:6px;padding:12px;margin-top:8px;color:rgba(255,255,255,.75);font-size:12px;line-height:2">
+        1. portal.azure.com &#8594; <strong>Criar recurso</strong> &#8594; <strong>Function App</strong><br>
+        2. Runtime: <strong>Node.js 18</strong> &middot; SO: <strong>Linux</strong> &middot; Plano: <strong>Consumo (gratuito)</strong><br>
+        3. Ap&#243;s criar &#8594; <strong>Fun&#231;&#245;es &#8594; + Criar &#8594; HTTP trigger</strong> &#8594; nome: <strong>BusinessmapProxy</strong><br>
+        4. Cole o c&#243;digo do arquivo <strong>index.js</strong> do zip baixado<br>
+        5. Em <strong>Integra&#231;&#227;o</strong>: marque m&#233;todos GET, POST, OPTIONS<br>
+        6. Copie a <strong>URL da fun&#231;&#227;o</strong> (inclui ?code=) e cole acima
+      </div>
+    </details>
+  </div>
+
+  <div class="form-wrapper">
+
+    <!-- ═══════════════════════════════════════
+         TAB: ABRIR CHAMADO
+    ════════════════════════════════════════ -->
+    <div id="tab-form">
+
+      <!-- CONFIG HIDDEN -->
+      <input type="hidden" id="cfg-apikey" value="JXpkGOXLAYY4I8E1HODw7OTQhhBQ8ssHp4sCdj3B"/>
+      <input type="hidden" id="cfg-boardid" value="95"/>
+      <input type="hidden" id="cfg-lane" value=""/>
+      <input type="hidden" id="cfg-emailjs-key" value=""/>
+      <input type="hidden" id="cfg-emailjs-service" value=""/>
+      <input type="hidden" id="cfg-emailjs-template" value=""/>
+
+      <form id="ticket-form" onsubmit="return false;">
+
+        <!-- IDENTIFICAÇÃO -->
+        <div class="panel" style="animation-delay:.05s">
+          <div class="panel-header">
+            <div class="panel-icon blue"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg></div>
+            <h2>Quem está abrindo o chamado?</h2><span>Obrigatório</span>
+          </div>
+          <div class="panel-body">
+            <div class="grid-2">
+              <div class="field">
+                <label>Nome completo <span class="req">*</span></label>
+                <input type="text" id="f-name" placeholder="Ex.: Ana Lima"/>
+              </div>
+              <div class="field">
+                <label>E-mail corporativo <span class="req">*</span><span class="hint">— receberá atualizações</span></label>
+                <input type="email" id="f-email" placeholder="ana.lima@strada.com.br"/>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label>Área / Time</label>
+                <select id="f-area">
+                  <option value="">Selecione sua área...</option>
+                  <optgroup label="Atendimento">
+                    <option>Atendimento</option><option>Pré Venda</option><option>Comercial</option>
+                  </optgroup>
+                  <optgroup label="Outras áreas">
+                    <option>Segurança da Informação</option><option>Engenharia</option><option>Produto</option>
+                    <option>Dados</option><option>Financeiro</option><option>Jurídico</option>
+                    <option>RH</option><option>Operações</option><option>Outro</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div class="field">
+                <label>Ramal / WhatsApp</label>
+                <input type="tel" id="f-phone" placeholder="(11) 9xxxx-xxxx"/>
+              </div>
+            </div>
+            <div class="email-info-box">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <p>Ao registrar o chamado, você receberá confirmação por e-mail. Use a aba <strong>Acompanhar Chamados</strong> para consultar o status a qualquer momento usando seu e-mail corporativo.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHAMADO -->
+        <div class="panel" style="animation-delay:.1s">
+          <div class="panel-header">
+            <div class="panel-icon orange"><svg viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M17 2H7a2 2 0 0 0-2 2v16l4-2 3 2 3-2 4 2V4a2 2 0 0 0-2-2z"/></svg></div>
+            <h2>Detalhes do chamado</h2><span>Obrigatório</span>
+          </div>
+          <div class="panel-body">
+            <div class="grid-2">
+              <div class="field">
+                <label>ID do Ticket de Referência<span class="hint">— se já existe</span></label>
+                <input type="text" id="f-ticket-ref" placeholder="Ex.: ATD-1234, INC-5678..."/>
+              </div>
+              <div class="field">
+                <label>Sistema / Produto afetado</label>
+                <input type="text" id="f-system" placeholder="Ex.: Portal, API, Carguero..."/>
+              </div>
+            </div>
+            <div class="field">
+              <label>Título do chamado <span class="req">*</span></label>
+              <input type="text" id="f-title" placeholder="Resuma o problema em uma linha..." maxlength="120"/>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label>Categoria <span class="req">*</span></label>
+                <select id="f-category">
+                  <option value="">Selecione...</option>
+                  <option>Apoio Análise</option><option>Bug</option><option>Dúvida Pontual</option>
+                  <option>Treinamento</option><option>Documentação da Área N3</option>
+                  <option>Acesso e permissões</option><option>Infraestrutura</option>
+                  <option>Segurança / Incidente</option><option>Suporte a sistema</option>
+                  <option>Solicitação de recurso</option><option>Melhoria de processo</option><option>Outros</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Urgência estimada</label>
+                <select id="f-urgency">
+                  <option value="">Selecione...</option>
+                  <option value="hoje">Preciso hoje</option><option value="semana">Esta semana</option>
+                  <option value="quinzena">Quinzena</option><option value="mes">Sem urgência / Mês</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Descrição detalhada <span class="req">*</span></label>
+              <textarea id="f-desc" rows="4" placeholder="Descreva o que aconteceu, quando e como reproduzir. Quanto mais detalhes, mais rápido o atendimento."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- EVIDÊNCIAS -->
+        <div class="panel" style="animation-delay:.15s">
+          <div class="panel-header">
+            <div class="panel-icon teal"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+            <h2>Evidências e anexos</h2><span>Opcional</span>
+          </div>
+          <div class="panel-body">
+            <div class="upload-zone" id="upload-zone">
+              <input type="file" id="f-files" multiple accept="image/*,video/*,.mp4,.mov,.avi,.webm" onchange="handleFiles(this.files)"/>
+              <div class="uz-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+              <p><strong>Arraste ou clique</strong> para anexar evidências</p>
+              <small>Imagens (PNG, JPG, GIF) e vídeos (MP4, MOV, AVI) · máx. 10MB por arquivo</small>
+            </div>
+            <div id="file-previews"></div>
+            <div style="margin-top:12px">
+              <label>URL de vídeo externo<span class="hint">— Google Drive, Loom, YouTube...</span></label>
+              <input type="text" id="f-video-url" placeholder="https://drive.google.com/file/..."/>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRIORIDADE -->
+        <div class="panel" style="animation-delay:.2s">
+          <div class="panel-header">
+            <div class="panel-icon purple"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <h2>Prioridade do chamado</h2>
+          </div>
+          <div class="panel-body">
+            <div class="priority-grid">
+              <div class="priority-tile" data-p="critical" onclick="selectPriority(this)"><div class="dot" style="background:#dc2626"></div><div class="pt-label">Crítica</div></div>
+              <div class="priority-tile" data-p="high" onclick="selectPriority(this)"><div class="dot" style="background:#ea580c"></div><div class="pt-label">Alta</div></div>
+              <div class="priority-tile sel-medium" data-p="medium" onclick="selectPriority(this)"><div class="dot" style="background:#ca8a04"></div><div class="pt-label">Média</div></div>
+              <div class="priority-tile" data-p="low" onclick="selectPriority(this)"><div class="dot" style="background:#16a34a"></div><div class="pt-label">Baixa</div></div>
+            </div>
+            <input type="hidden" id="f-priority" value="medium"/>
+          </div>
+        </div>
+
+        <!-- ENVIO -->
+        <div style="animation:fadeUp .35s .25s ease both;opacity:0;animation-fill-mode:forwards">
+          <button class="btn-submit" id="btn-send" onclick="submitTicket()">
+            <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            <span id="btn-text">Registrar chamado no board</span>
+            <div class="spinner" id="spinner"></div>
+          </button>
+          <div class="progress-bar-wrap" id="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+          <div id="status-box"></div>
+        </div>
+      </form>
+
+      <!-- SUCCESS -->
+      <div id="success-screen">
+        <div class="success-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3"/></svg></div>
+        <h2>Chamado registrado!</h2>
+        <div class="ticket-badge">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#2563a8"><path d="M2 20h20M5 20V10l7-7 7 7v10M9 20v-5h6v5"/></svg>
+          <span id="ticket-id">Ticket #—</span>
+        </div>
+        <div class="success-details">
+          <div class="sd-row">
+            <div class="sd-icon" style="background:#e0f2fe"><svg viewBox="0 0 24 24" style="fill:#0369a1"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <div><div class="sd-label">Confirmação enviada para</div><div class="sd-value" id="ss-email">—</div></div>
+          </div>
+          <div class="sd-row">
+            <div class="sd-icon" style="background:#fef9c3"><svg viewBox="0 0 24 24" style="fill:#ca8a04"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div><div class="sd-label">Status atual</div><div class="sd-value">Backlog — aguardando triagem</div></div>
+          </div>
+          <div class="sd-row">
+            <div class="sd-icon" style="background:#f3e8ff"><svg viewBox="0 0 24 24" style="fill:#7c3aed"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div><div class="sd-label">Evidências anexadas</div><div class="sd-value" id="ss-attachments">Nenhuma</div></div>
+          </div>
+        </div>
+        <p>Acesse a aba <strong>Acompanhar Chamados</strong> e consulte o status com seu e-mail a qualquer momento.</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:.5rem">
+          <button class="btn-new" onclick="resetForm()">Abrir novo chamado</button>
+          <button class="btn-new" onclick="switchTab('track');document.getElementById('track-email').value=document.getElementById('f-email').value;searchTickets()" style="background:var(--brand-mid);color:#fff;border-color:var(--brand-mid)">Ver meus chamados →</button>
+        </div>
+        <br/>
+        <a class="board-link" href="https://stradaz3.businessmap.io/ctrl_board/95/" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+          Ver board no Businessmap
+        </a>
+      </div>
+
+    </div><!-- /tab-form -->
+
+    <!-- ═══════════════════════════════════════
+         TAB: ACOMPANHAR CHAMADOS
+    ════════════════════════════════════════ -->
+    <div id="tab-track" style="display:none">
+
+      <!-- BUSCA -->
+      <div class="search-card">
+        <h2>Consultar meus chamados</h2>
+        <p>Informe seu e-mail corporativo para ver todos os tickets abertos por você no board de atendimento, com status em tempo real.</p>
+        <div class="search-row">
+          <input type="email" id="track-email" placeholder="seu.email@strada.com.br" onkeydown="if(event.key==='Enter')searchTickets()"/>
+          <button class="btn-search" id="btn-search" onclick="searchTickets()">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Buscar
+          </button>
+        </div>
+        <div id="track-status" style="display:none;margin-top:.75rem;font-size:13px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid"></div>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="tickets-list"></div>
+
+    </div><!-- /tab-track -->
+
+  </div><!-- /form-wrapper -->
+</main>
+
+<footer>Central de Atendimento · Strada &nbsp;·&nbsp; Board #95 — Backlog Demanda Atendimento</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════ */
+function switchTab(t) {
+  document.getElementById('tab-form').style.display  = t==='form'  ? 'block' : 'none';
+  document.getElementById('tab-track').style.display = t==='track' ? 'block' : 'none';
+  document.getElementById('steps-bar').style.display = t==='form'  ? 'flex'  : 'none';
+  document.getElementById('tab-btn-form').className  = 'tab-btn' + (t==='form'  ? ' active' : '');
+  document.getElementById('tab-btn-track').className = 'tab-btn' + (t==='track' ? ' active' : '');
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM HELPERS
+═══════════════════════════════════════════════════ */
+let selectedPriority = 'medium';
+let attachedFiles = [];
+
+function selectPriority(el) {
+  document.querySelectorAll('.priority-tile').forEach(t => t.className = 'priority-tile');
+  const p = el.getAttribute('data-p');
+  el.classList.add('sel-' + p);
+  selectedPriority = p;
+  document.getElementById('f-priority').value = p;
+}
+
+function setStep(n) {
+  [1,2,3,4].forEach(i => {
+    const s = document.getElementById('step-' + i);
+    s.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+}
+
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+
+function handleFiles(fileList) {
+  Array.from(fileList).forEach(f => {
+    if (f.size > 10*1024*1024) { alert(`Arquivo ${f.name} excede 10MB.`); return; }
+    if (attachedFiles.find(x => x.name===f.name && x.size===f.size)) return;
+    attachedFiles.push(f);
+    const wrap = document.getElementById('file-previews');
+    const div = document.createElement('div');
+    const isVideo = f.type.startsWith('video/');
+    div.className = 'file-preview' + (isVideo ? ' is-video' : '');
+    div.dataset.name = f.name;
+    if (isVideo) {
+      div.innerHTML = `<div class="fp-thumb"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><span class="fp-name">${f.name}</span><button class="fp-remove" onclick="removeFile('${f.name}')">✕</button>`;
+    } else {
+      const url = URL.createObjectURL(f);
+      div.innerHTML = `<img src="${url}" alt="${f.name}"/><span class="fp-name">${f.name}</span><button class="fp-remove" onclick="removeFile('${f.name}')">✕</button>`;
+    }
+    wrap.appendChild(div);
+  });
+}
+
+function removeFile(name) {
+  attachedFiles = attachedFiles.filter(f => f.name !== name);
+  const el = document.querySelector(`.file-preview[data-name="${name}"]`);
+  if (el) el.remove();
+}
+
+function fileToBase64(f) {
+  return new Promise((res,rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(f); });
+}
+
+function setProgress(pct) {
+  const wrap = document.getElementById('progress-wrap');
+  const bar  = document.getElementById('progress-bar');
+  wrap.style.display = pct > 0 ? 'block' : 'none';
+  bar.style.width = pct + '%';
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('status-box');
+  el.style.display = 'block'; el.className = type; el.textContent = msg;
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function setLoading(on, msg) {
+  const btn = document.getElementById('btn-send');
+  const txt = document.getElementById('btn-text');
+  const sp  = document.getElementById('spinner');
+  btn.disabled = on;
+  txt.textContent = on ? (msg || 'Processando...') : 'Registrar chamado no board';
+  sp.style.display = on ? 'block' : 'none';
+}
+
+/* ═══════════════════════════════════════════════════
+   POWER AUTOMATE — URLs dos flows (admin configura aqui)
+   Flow "Criar Card":  recebe o payload e chama POST /api/v2/cards
+   Flow "Buscar Cards": recebe {email, board_id} e retorna lista
+   ─────────────────────────────────────────────────
+   Como criar os flows: veja o banner de setup no topo da página.
+═══════════════════════════════════════════════════ */
+const PA_CREATE_URL = localStorage.getItem('pa_create_url') || '';
+const PA_SEARCH_URL = localStorage.getItem('pa_create_url') || ''; // mesma function, action diferente
+
+// Mostra banner de setup se URL não configurada
+(function checkSetup() {
+  if (!PA_CREATE_URL) {
+    document.getElementById('setup-banner').style.display = 'flex';
+  } else {
+    // Mostra indicador verde no botão Configurar
+    const btn = document.getElementById('tab-btn-config');
+    if (btn) btn.style.opacity = '1';
+  }
+})();
+
+function openConfig() {
+  const banner = document.getElementById('setup-banner');
+  const isOpen = banner.style.display === 'flex';
+  banner.style.display = isOpen ? 'none' : 'flex';
+  if (!isOpen) {
+    // Pré-preenche com URL atual se já existir
+    const current = localStorage.getItem('pa_create_url') || '';
+    if (current) document.getElementById('setup-create-url').value = current;
+    banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function saveFlowUrls() {
+  const cu = document.getElementById('setup-create-url').value.trim();
+  if (!cu) { alert('Cole a URL do Cloudflare Worker.'); return; }
+  localStorage.setItem('pa_create_url', cu);
+  const msg = document.getElementById('setup-saved-msg');
+  msg.style.display = 'inline';
+  msg.textContent = '✓ URL salva!';
+  const btn = document.getElementById('tab-btn-config');
+  if (btn) { btn.style.opacity = '1'; btn.style.color = '#4ade80'; }
+  setTimeout(() => {
+    document.getElementById('setup-banner').style.display = 'none';
+    msg.style.display = 'none';
+  }, 1200);
+}
+
+/* Chama a Azure Function como proxy — sem CORS */
+async function callFlow(baseUrl, body, action) {
+  // Append ?action= sem quebrar ?code= já existente na URL
+  const url = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'action=' + (action || 'create_card');
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const text = await res.text();
+  try { return { ok: res.ok, status: res.status, data: JSON.parse(text) }; }
+  catch { return { ok: res.ok, status: res.status, data: { raw: text } }; }
+}
+
+/* ═══════════════════════════════════════════════════
+   SUBMIT TICKET
+═══════════════════════════════════════════════════ */
+async function submitTicket() {
+  const name      = document.getElementById('f-name').value.trim();
+  const email     = document.getElementById('f-email').value.trim();
+  const title     = document.getElementById('f-title').value.trim();
+  const category  = document.getElementById('f-category').value;
+  const desc      = document.getElementById('f-desc').value.trim();
+  const area      = document.getElementById('f-area').value;
+  const phone     = document.getElementById('f-phone').value.trim();
+  const system    = document.getElementById('f-system').value.trim();
+  const ticketRef = document.getElementById('f-ticket-ref').value.trim();
+  const urgency   = document.getElementById('f-urgency').value;
+  const videoUrl  = document.getElementById('f-video-url').value.trim();
+  const priority  = document.getElementById('f-priority').value;
+  const laneId    = document.getElementById('cfg-lane').value.trim();
+  const flowUrl   = localStorage.getItem('pa_create_url') || '';
+
+  const missing = [];
+  if (!name)     missing.push('Nome');
+  if (!email)    missing.push('E-mail');
+  if (!title)    missing.push('Título');
+  if (!category) missing.push('Categoria');
+  if (!desc)     missing.push('Descrição');
+  if (missing.length) { showStatus('Preencha: ' + missing.join(', '), 'error'); return; }
+  if (!flowUrl)  { showStatus('Configure a URL do Power Automate no banner acima antes de enviar.', 'error'); document.getElementById('setup-banner').style.display='flex'; return; }
+
+  setStep(2); setLoading(true,'Criando card...'); setProgress(10);
+
+  const urgencyLabel = {hoje:'Preciso hoje',semana:'Esta semana',quinzena:'Quinzena',mes:'Sem urgência'};
+  const priorityMap  = {critical:'Critical',high:'High',medium:'Medium',low:'Low'};
+
+  const descFormatted =
+    `📋 **Solicitante:** ${name} (${email})\n` +
+    `🏢 **Área:** ${area||'Não informado'}\n` +
+    `📞 **Contato:** ${phone||'Não informado'}\n` +
+    `💻 **Sistema:** ${system||'Não informado'}\n` +
+    `🏷️ **Categoria:** ${category}\n` +
+    (ticketRef?`🔗 **Ref. Ticket:** ${ticketRef}\n`:'') +
+    (urgency  ?`⏱ **Urgência:** ${urgencyLabel[urgency]}\n`:'') +
+    (videoUrl ?`🎬 **Vídeo:** ${videoUrl}\n`:'') +
+    `\n---\n\n${desc}`;
+
+  // Payload enviado ao Power Automate — ele repassa ao Businessmap
+  const payload = {
+    apikey:      API_KEY,
+    board_id:    BOARD_ID,
+    lane_id:     laneId ? parseInt(laneId) : undefined,
+    title:       `[${category}] ${title}` + (ticketRef ? ` — Ref: ${ticketRef}` : ''),
+    description: descFormatted,
+    priority:    priorityMap[priority] || 'Medium',
+    tags:        [category, area].filter(Boolean),
+    // anexos inline (imagens pequenas em base64)
+    attachments: [],
+    video_url:   videoUrl || undefined
+  };
+
+  // Converte imagens para base64 e inclui no payload
+  if (attachedFiles.length > 0) {
+    setLoading(true, 'Preparando evidências...'); setProgress(30);
+    for (let i = 0; i < attachedFiles.length; i++) {
+      const f = attachedFiles[i];
+      try {
+        const b64 = await fileToBase64(f);
+        payload.attachments.push({ filename: f.name, data: b64, mime_type: f.type });
+      } catch(e) { console.warn('Arquivo ignorado:', f.name); }
+      setProgress(30 + Math.round((i+1)/attachedFiles.length * 30));
+    }
+  }
+
+  let cardId = null;
+
+  try {
+    setLoading(true, 'Registrando no Businessmap...'); setProgress(65);
+    const result = await callFlow(flowUrl, payload, 'create_card');
+
+    if (!result.ok) {
+      const msg = result.data?.message || result.data?.error || result.data?.raw || 'Erro ' + result.status;
+      throw new Error(msg);
+    }
+
+    cardId = result.data?.card_id || result.data?.data?.card_id || result.data?.id || '✓';
+    setProgress(100); setLoading(false); setStep(4);
+
+    document.getElementById('ticket-form').style.display = 'none';
+    document.getElementById('ticket-id').textContent = 'Ticket #' + cardId;
+    document.getElementById('ss-email').textContent = email;
+    document.getElementById('ss-attachments').textContent =
+      attachedFiles.length > 0
+        ? attachedFiles.length + ' arquivo(s)' + (videoUrl ? ' + vídeo' : '')
+        : (videoUrl ? 'Vídeo externo' : 'Nenhuma');
+    document.getElementById('success-screen').style.display = 'block';
+    setProgress(0);
+
+  } catch(err) {
+    setLoading(false); setProgress(0); setStep(1);
+    showStatus('Erro ao criar chamado: ' + err.message, 'error');
+  }
+}
+
+function resetForm() {
+  document.getElementById('ticket-form').reset();
+  document.getElementById('ticket-form').style.display = 'block';
+  document.getElementById('success-screen').style.display = 'none';
+  document.getElementById('status-box').style.display = 'none';
+  document.getElementById('file-previews').innerHTML = '';
+  attachedFiles = [];
+  selectPriority(document.querySelector('[data-p="medium"]'));
+  setStep(1); setProgress(0);
+}
+
+/* ═══════════════════════════════════════════════════
+   ACOMPANHAMENTO DE CHAMADOS
+═══════════════════════════════════════════════════ */
+const COLUMNS_ORDER = ['Backlog','Requested','In Progress','Done'];
+
+function colToStatus(col) {
+  const c = (col||'').toLowerCase();
+  if (c.includes('backlog'))    return 'backlog';
+  if (c.includes('request'))   return 'requested';
+  if (c.includes('progress'))  return 'inprogress';
+  if (c.includes('done')||c.includes('conclu')||c.includes('resolv')) return 'done';
+  return 'unknown';
+}
+
+function statusPill(col) {
+  const s = colToStatus(col);
+  const labels = {backlog:'Backlog',requested:'Requested',inprogress:'In Progress',done:'Done',unknown:col||'Desconhecido'};
+  return `<span class="status-pill sp-${s}"><span class="sp-dot"></span>${labels[s]}</span>`;
+}
+
+function kanbanProgress(col) {
+  const current = colToStatus(col);
+  const steps   = ['backlog','requested','inprogress','done'];
+  const labels  = ['Backlog','Requested','In Progress','Done'];
+  const idx     = steps.indexOf(current);
+  return `<div class="kanban-track">${steps.map((s,i)=>{
+    const state = i < idx ? 'done' : i === idx ? 'active' : '';
+    const check = i < idx ? `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>` : '';
+    return `<div class="kt-step ${state}"><div class="kt-dot">${check}</div><div class="kt-label">${labels[i]}</div></div>`;
+  }).join('')}</div>`;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch { return d; }
+}
+
+function priorityBadge(p) {
+  const map = {Critical:'🔴 Crítica',High:'🟠 Alta',Medium:'🟡 Média',Low:'🟢 Baixa'};
+  return map[p]||p||'—';
+}
+
+async function searchTickets() {
+  const email   = document.getElementById('track-email').value.trim();
+  const apiKey  = API_KEY;
+  const boardId = String(BOARD_ID);
+  const list    = document.getElementById('tickets-list');
+  const flowUrl = localStorage.getItem('pa_search_url') || '';
+
+  if (!email) { showTrackMsg('Informe seu e-mail para buscar.','error'); return; }
+
+  document.getElementById('btn-search').disabled = true;
+  list.innerHTML = `<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando chamados...</p></div>`;
+  document.getElementById('track-status').style.display='none';
+
+  try {
+    let cards = [];
+
+    if (flowUrl) {
+      // Via Power Automate (SharePoint)
+      const result = await callFlow(flowUrl, { email, board_id: BOARD_ID, apikey: API_KEY }, 'search_cards');
+      if (!result.ok) throw new Error(result.data?.message || 'Erro ' + result.status);
+      cards = result.data?.cards || result.data?.data?.cards || result.data || [];
+    } else {
+      // Fallback direto (fora do SharePoint, sem CORS)
+      const res = await fetch(`https://stradaz3.businessmap.io/api/v2/cards?board_id=${boardId}&page_size=100`, {
+        headers: { 'apikey': apiKey }
+      });
+      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.message||'Erro '+res.status); }
+      const data = await res.json();
+      const all  = data.data?.cards || data.cards || data.data || [];
+      const emailLower = email.toLowerCase();
+      cards = all.filter(c => ((c.description||'')+(c.title||'')).toLowerCase().includes(emailLower));
+    }
+
+    document.getElementById('btn-search').disabled = false;
+
+    if (mine.length === 0) {
+      list.innerHTML = `<div class="state-box">
+        <div class="sb-icon" style="background:#f1f5f9"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:#94a3b8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <h3>Nenhum chamado encontrado</h3>
+        <p>Não encontramos tickets associados a <strong>${email}</strong> no board #${boardId}.</p>
+      </div>`;
+      return;
+    }
+
+    const mine = cards;
+    showTrackMsg(`${mine.length} chamado(s) encontrado(s) para ${email}`,'success');
+    list.innerHTML = '';
+
+    mine.sort((a,b) => new Date(b.created_at||0)-new Date(a.created_at||0));
+
+    mine.forEach((card,idx) => {
+      const col    = card.column_name||card.column||'';
+      const cardId = card.card_id||card.id||'—';
+      const div    = document.createElement('div');
+      div.className = 'ticket-card';
+      div.innerHTML = `
+        <div class="tc-header" onclick="toggleCard(this.closest('.ticket-card'))">
+          <span class="tc-id">#${cardId}</span>
+          ${statusPill(col)}
+          <span class="tc-title" title="${(card.title||'').replace(/"/g,'&quot;')}">${card.title||'(sem título)'}</span>
+          <svg class="tc-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="tc-body">
+          ${kanbanProgress(col)}
+          <div class="td-grid">
+            <div class="td-item"><div class="td-label">Criado em</div><div class="td-val">${fmtDate(card.created_at)}</div></div>
+            <div class="td-item"><div class="td-label">Atualizado</div><div class="td-val">${fmtDate(card.updated_at)}</div></div>
+            <div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">${priorityBadge(card.priority)}</div></div>
+            <div class="td-item"><div class="td-label">Responsável</div><div class="td-val">${card.owner_user_name||card.owner||'Não atribuído'}</div></div>
+          </div>
+          ${card.description?`<div class="tc-desc">${card.description.replace(/</g,'&lt;').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>`:''}
+          <div class="tc-actions">
+            <a href="https://stradaz3.businessmap.io/ctrl_board/95/" target="_blank">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+              Ver no board
+            </a>
+            <button onclick="refreshCard(${cardId},this.closest('.ticket-card'))">
+              <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Atualizar status
+            </button>
+          </div>
+        </div>`;
+      list.appendChild(div);
+      // auto-open first card
+      if (idx===0) div.classList.add('open');
+    });
+
+  } catch(err) {
+    document.getElementById('btn-search').disabled = false;
+    // DEMO MODE
+    if (err.message.includes('fetch')||err.message.includes('Failed')) {
+      renderDemoTickets(email, list);
+    } else {
+      list.innerHTML='';
+      showTrackMsg('Erro ao buscar chamados: '+err.message,'error');
+    }
+  }
+}
+
+function showTrackMsg(msg,type){
+  const el=document.getElementById('track-status');
+  el.style.display='block';el.textContent=msg;
+  if(type==='success'){el.style.background='var(--success-bg)';el.style.color='var(--success)';el.style.borderColor='#bbf7d0';}
+  else if(type==='error'){el.style.background='var(--error-bg)';el.style.color='var(--error)';el.style.borderColor='#fecaca';}
+  else{el.style.background='var(--brand-light)';el.style.color='var(--brand-mid)';el.style.borderColor='#93c5fd';}
+}
+
+function toggleCard(el) {
+  el.classList.toggle('open');
+}
+
+async function refreshCard(cardId, cardEl) {
+  const apiKey = API_KEY;
+  const btn = cardEl.querySelector('button');
+  const origHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor;animation:spin .7s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Atualizando...';
+
+  try {
+    const res  = await fetch(`https://stradaz3.businessmap.io/api/v2/cards/${cardId}`,{headers:{'apikey':apiKey}});
+    const data = await res.json();
+    const card = data.data||data;
+    const col  = card.column_name||card.column||'';
+
+    // update pill
+    const pill = cardEl.querySelector('.tc-header .status-pill');
+    if (pill) pill.outerHTML = statusPill(col);
+
+    // update kanban
+    const kanban = cardEl.querySelector('.kanban-track');
+    if (kanban) kanban.outerHTML = kanbanProgress(col);
+
+    // update updated_at
+    const updEls = cardEl.querySelectorAll('.td-val');
+    if (updEls[1]) updEls[1].textContent = fmtDate(card.updated_at);
+    if (updEls[2]) updEls[2].textContent = priorityBadge(card.priority);
+    if (updEls[3]) updEls[3].textContent = card.owner_user_name||card.owner||'Não atribuído';
+
+  } catch(e) { console.warn(e); }
+
+  btn.disabled=false; btn.innerHTML=origHtml;
+}
+
+/* demo mode */
+function renderDemoTickets(email, container) {
+  showTrackMsg('Modo demonstração — conecte a API Key para dados reais','info');
+  const demos=[
+    {id:'DEMO-001',title:'[Bug] Erro ao exportar relatório financeiro',col:'In Progress',priority:'High',created:'2026-05-28T09:12:00Z',updated:'2026-06-02T14:30:00Z',owner:'Marcos Andrade',desc:`📋 **Solicitante:** ${email}\n🏢 **Área:** Financeiro\n📞 **Contato:** (11) 98765-4321\n💻 **Sistema:** Portal\n🏷️ **Categoria:** Bug\n\n---\n\nAo clicar em Exportar PDF no módulo financeiro, a tela trava e o arquivo não é gerado.`},
+    {id:'DEMO-002',title:'[Dúvida Pontual] Como configurar integração SSO',col:'Requested',priority:'Medium',created:'2026-06-01T11:00:00Z',updated:'2026-06-01T15:22:00Z',owner:'',desc:`📋 **Solicitante:** ${email}\n🏢 **Área:** Engenharia\n\n---\n\nPreciso entender como habilitar SSO com o Azure AD.`},
+    {id:'DEMO-003',title:'[Apoio Análise] Dashboard de métricas — acesso negado',col:'Backlog',priority:'Low',created:'2026-06-03T08:30:00Z',updated:'2026-06-03T08:30:00Z',owner:'',desc:`📋 **Solicitante:** ${email}\n🏢 **Área:** Dados\n\n---\n\nSem permissão para acessar o dashboard de métricas de conversão.`},
+  ];
+  container.innerHTML='';
+  demos.forEach((d,idx)=>{
+    const div=document.createElement('div');
+    div.className='ticket-card'+(idx===0?' open':'');
+    div.innerHTML=`
+      <div class="tc-header" onclick="toggleCard(this.closest('.ticket-card'))">
+        <span class="tc-id">#${d.id}</span>
+        ${statusPill(d.col)}
+        <span class="tc-title">${d.title}</span>
+        <svg class="tc-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="tc-body">
+        ${kanbanProgress(d.col)}
+        <div class="td-grid">
+          <div class="td-item"><div class="td-label">Criado em</div><div class="td-val">${fmtDate(d.created)}</div></div>
+          <div class="td-item"><div class="td-label">Atualizado</div><div class="td-val">${fmtDate(d.updated)}</div></div>
+          <div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">${priorityBadge(d.priority)}</div></div>
+          <div class="td-item"><div class="td-label">Responsável</div><div class="td-val">${d.owner||'Não atribuído'}</div></div>
+        </div>
+        <div class="tc-desc">${d.desc.replace(/</g,'&lt;').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>
+        <div class="tc-actions">
+          <a href="https://stradaz3.businessmap.io/ctrl_board/95/" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>Ver no board</a>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   AUTO-DETECT LANE ID — "Backlog Demanda Atendimento"
+   Roda silenciosamente ao carregar a página.
+   Busca a estrutura do board e encontra o lane
+   cujo nome contém "Backlog" + "Demanda" ou "Atendimento".
+═══════════════════════════════════════════════════ */
+const API_KEY  = 'JXpkGOXLAYY4I8E1HODw7OTQhhBQ8ssHp4sCdj3B';
+const BOARD_ID = 95;
+let   resolvedLaneId   = null;
+let   resolvedColumnId = null;
+
+async function autoDetectLane() {
+  try {
+    // 1. Busca lanes do board
+    const r = await fetch(`https://stradaz3.businessmap.io/api/v2/boards/${BOARD_ID}/lanes`, {
+      headers: { 'apikey': API_KEY }
+    });
+    if (!r.ok) return;
+    const d = await r.json();
+    const lanes = d.data?.lanes || d.lanes || d.data || [];
+    // Procura lane "Backlog Demanda Atendimento"
+    const target = lanes.find(l => {
+      const n = (l.name || l.title || '').toLowerCase();
+      return (n.includes('backlog') && (n.includes('demanda') || n.includes('atendimento'))) ||
+             n.includes('backlog demanda');
+    });
+    if (target) {
+      resolvedLaneId = target.lane_id || target.id;
+      document.getElementById('cfg-lane').value = resolvedLaneId;
+      console.info('[Strada] Lane detectado:', target.name, '— ID:', resolvedLaneId);
+    }
+
+    // 2. Busca colunas do board e encontra "Backlog"
+    const rc = await fetch(`https://stradaz3.businessmap.io/api/v2/boards/${BOARD_ID}/columns`, {
+      headers: { 'apikey': API_KEY }
+    });
+    if (!rc.ok) return;
+    const dc = await rc.json();
+    const cols = dc.data?.columns || dc.columns || dc.data || [];
+    const backlogCol = cols.find(c => {
+      const n = (c.name || c.title || '').toLowerCase();
+      return n === 'backlog' || n.includes('backlog');
+    });
+    if (backlogCol) {
+      resolvedColumnId = backlogCol.column_id || backlogCol.id;
+      console.info('[Strada] Coluna Backlog detectada — ID:', resolvedColumnId);
+    }
+  } catch(e) {
+    console.warn('[Strada] Auto-detect lane silencioso:', e.message);
+  }
+}
+
+// Injeta lane_id e column_id no payload se detectados
+const _origSubmit = submitTicket;
+window.submitTicket = async function() {
+  // Garante que laneId do hidden input seja sempre o detectado
+  if (resolvedLaneId) document.getElementById('cfg-lane').value = resolvedLaneId;
+  await _origSubmit();
+};
+
+// Ao enviar o card, aplica column_id de Backlog se disponível
+const _origFetch = window.fetch;
+// Não substituímos fetch globalmente — injetamos direto no payload via override do submitTicket acima.
+// O lane_id já é lido de cfg-lane dentro de submitTicket.
+
+// Roda a detecção assim que a página carrega
+document.addEventListener('DOMContentLoaded', () => {
+  autoDetectLane();
+});
+// Também roda imediatamente caso DOMContentLoaded já tenha disparado
+if (document.readyState !== 'loading') autoDetectLane();
+</script>
+</body>
+</html>

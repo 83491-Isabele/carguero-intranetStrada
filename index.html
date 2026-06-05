@@ -890,7 +890,7 @@ async function submitTicket() {
       const f = attachedFiles[i];
       try {
         const b64 = await fileToBase64(f);
-        payload.attachments.push({ filename: f.name, data: b64, mime_type: f.type });
+        payload.attachments.push({ file_name: f.name, data: b64, mime_type: f.type });
       } catch(e) { console.warn('Arquivo ignorado:', f.name); }
       setProgress(30 + Math.round((i+1)/attachedFiles.length * 30));
     }

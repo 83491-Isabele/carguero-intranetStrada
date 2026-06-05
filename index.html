@@ -246,20 +246,119 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- ══════════════════════════════════════
+     TELA DE LOGIN
+══════════════════════════════════════ -->
+<div id="login-screen" style="display:flex;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 60%,#3a1a10 100%);padding:1.5rem">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <!-- Cabeçalho login -->
+    <div style="background:#1a1a1a;padding:2rem;text-align:center">
+      <svg width="110" height="30" viewBox="0 0 370 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="0,85 0,5 32,45" fill="#E84E1B"/>
+        <polygon points="18,85 18,5 50,45" fill="#E84E1B" opacity="0.55"/>
+        <text x="65" y="64" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="52" fill="#ffffff" letter-spacing="-1">Strada</text>
+      </svg>
+      <p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:.5rem">Central de Atendimento</p>
+    </div>
+    <!-- Form login -->
+    <div style="padding:2rem">
+      <h2 style="font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:.3rem">Bem-vindo(a)</h2>
+      <p style="font-size:13px;color:#999;margin-bottom:1.5rem">Entre com seu e-mail corporativo e senha</p>
+      <div style="margin-bottom:1rem">
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">E-mail corporativo</label>
+        <input type="email" id="login-email" placeholder="seu.nome@strada.log.br"
+          style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s"
+          onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()"
+          onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+      </div>
+      <div style="margin-bottom:1.25rem;position:relative">
+        <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Senha</label>
+        <input type="password" id="login-password" placeholder="••••••••"
+          style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s"
+          onkeydown="if(event.key==='Enter')doLogin()"
+          onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+      </div>
+      <div id="login-error" style="display:none;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:1rem"></div>
+      <button onclick="doLogin()" style="width:100%;padding:13px;background:#E84E1B;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#c43a10'" onmouseout="this.style.background='#E84E1B'">
+        Entrar →
+      </button>
+      <p style="text-align:center;font-size:12px;color:#bbb;margin-top:1rem">Não tem acesso? Fale com o administrador.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL GERENCIAR USUÁRIOS
+══════════════════════════════════════ -->
+<div id="user-manager-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="background:#1a1a1a;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-radius:16px 16px 0 0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:30px;height:30px;background:#E84E1B;border-radius:7px;display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#fff"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <span style="color:#fff;font-size:14px;font-weight:600">Gerenciar Usuários</span>
+      </div>
+      <button onclick="closeUserManager()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:18px;line-height:1">✕</button>
+    </div>
+    <div style="padding:1.5rem">
+      <!-- Lista de usuários -->
+      <h3 style="font-size:13px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">Usuários cadastrados</h3>
+      <div id="um-list" style="margin-bottom:1.5rem"></div>
+
+      <!-- Adicionar usuário -->
+      <div style="background:#f8f8f8;border-radius:10px;padding:1.25rem;border:1px solid #e8e8e8">
+        <h3 style="font-size:13px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem">Adicionar novo usuário</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:600;color:#777;margin-bottom:3px">Nome completo</label>
+            <input type="text" id="um-name" placeholder="Ana Lima" style="width:100%;padding:8px 10px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;font-family:inherit;outline:none" onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:600;color:#777;margin-bottom:3px">E-mail corporativo</label>
+            <input type="email" id="um-email" placeholder="ana.lima@strada.log.br" style="width:100%;padding:8px 10px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;font-family:inherit;outline:none" onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:600;color:#777;margin-bottom:3px">Senha inicial</label>
+            <input type="text" id="um-password" placeholder="senha123" style="width:100%;padding:8px 10px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;font-family:inherit;outline:none" onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:600;color:#777;margin-bottom:3px">Perfil</label>
+            <select id="um-role" style="width:100%;padding:8px 10px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:13px;font-family:inherit;outline:none;background:#fff;cursor:pointer" onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'">
+              <option value="atendimento">Atendimento</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        </div>
+        <div id="um-error" style="display:none;background:#fee2e2;color:#dc2626;border-radius:6px;padding:7px 10px;font-size:12px;margin-bottom:8px"></div>
+        <button onclick="addUser()" style="width:100%;padding:10px;background:#E84E1B;color:#fff;border:none;border-radius:7px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#c43a10'" onmouseout="this.style.background='#E84E1B'">
+          + Adicionar usuário
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP WRAPPER -->
+<div id="app-wrapper" style="display:none">
 <header>
-  <!-- Logo Strada — setas apontando para a DIREITA -->
   <div style="display:flex;align-items:center;gap:12px">
     <svg width="130" height="34" viewBox="0 0 370 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Seta 1 — maior, apontando para direita -->
       <polygon points="0,85 0,5 32,45" fill="#E84E1B"/>
-      <!-- Seta 2 — menor, apontando para direita, deslocada -->
       <polygon points="18,85 18,5 50,45" fill="#E84E1B" opacity="0.55"/>
-      <!-- Texto Strada -->
       <text x="65" y="64" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="52" fill="#ffffff" letter-spacing="-1">Strada</text>
     </svg>
   </div>
-  <span style="background:rgba(232,78,27,.2);color:#ff7a50;font-size:12px;padding:4px 14px;border-radius:20px;border:1px solid rgba(232,78,27,.35);font-weight:500">Central de Atendimento</span>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div id="user-badge" style="display:none;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;color:rgba(255,255,255,.9);font-size:12px;font-weight:500">
+      <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
+      <span id="user-name-badge">-</span>
+    </div>
+    <button id="btn-user-manager" onclick="openUserManager()" style="display:none;background:rgba(232,78,27,.2);border:1px solid rgba(232,78,27,.4);color:#ff7a50;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit">👥 Usuários</button>
+    <button onclick="logout()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit">Sair</button>
+  </div>
 </header>
 
 <!-- HERO -->
@@ -677,6 +776,8 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
 
   </div><!-- /form-wrapper -->
 </main>
+
+</div><!-- /app-wrapper -->
 
 <footer>Central de Atendimento · Strada &nbsp;·&nbsp; Board #95 — Backlog Demanda Atendimento</footer>
 
@@ -1313,6 +1414,177 @@ window.submitTicket = async function() {
 const _origFetch = window.fetch;
 // Não substituímos fetch globalmente — injetamos direto no payload via override do submitTicket acima.
 // O lane_id já é lido de cfg-lane dentro de submitTicket.
+
+// ═══════════════════════════════════════════════════
+// AUTH SYSTEM
+// ═══════════════════════════════════════════════════
+const SUPER_ADMIN  = 'isabele.aquino@strada.log.br'; // único que gerencia usuários
+const CONFIG_ADMINS = [
+  'isabele.aquino@strada.log.br',
+  'paula.calefi@strada.log.br',
+  'guilherme.cruz@strada.log.br'
+];
+
+// Usuários pré-cadastrados (senha hash simples via btoa)
+function getUsers() {
+  const stored = localStorage.getItem('strada_users');
+  if (stored) return JSON.parse(stored);
+  // Usuários padrão iniciais
+  const defaults = [
+    { email: 'isabele.aquino@strada.log.br',  name: 'Isabele Aquino',   role: 'admin',      password: btoa('strada@2024') },
+    { email: 'paula.calefi@strada.log.br',    name: 'Paula Calefi',     role: 'admin',      password: btoa('strada@2024') },
+    { email: 'guilherme.cruz@strada.log.br',  name: 'Guilherme Cruz',   role: 'admin',      password: btoa('strada@2024') },
+  ];
+  localStorage.setItem('strada_users', JSON.stringify(defaults));
+  return defaults;
+}
+
+function saveUsers(users) {
+  localStorage.setItem('strada_users', JSON.stringify(users));
+}
+
+function getCurrentUser() {
+  const s = localStorage.getItem('strada_session');
+  return s ? JSON.parse(s) : null;
+}
+
+function login(email, password) {
+  const users = getUsers();
+  const user  = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === btoa(password));
+  if (!user) return false;
+  localStorage.setItem('strada_session', JSON.stringify({ email: user.email, name: user.name, role: user.role }));
+  return true;
+}
+
+function logout() {
+  localStorage.removeItem('strada_session');
+  location.reload();
+}
+
+function isSuperAdmin(email) { return email === SUPER_ADMIN; }
+function isConfigAdmin(email) { return CONFIG_ADMINS.includes(email); }
+
+// ── Controla visibilidade do botão Configurar ──
+function applyPermissions(user) {
+  // Botão Configurar — só admins
+  const configBtn = document.getElementById('tab-btn-config');
+  if (configBtn) configBtn.style.display = isConfigAdmin(user.email) ? 'flex' : 'none';
+
+  // Badge com nome do usuário
+  const badge = document.getElementById('user-badge');
+  const nameBadge = document.getElementById('user-name-badge');
+  if (badge && nameBadge) {
+    nameBadge.textContent = user.name.split(' ')[0];
+    badge.style.display = 'flex';
+  }
+
+  // Botão gerenciar usuários — só super admin
+  const umBtn = document.getElementById('btn-user-manager');
+  if (umBtn) umBtn.style.display = isSuperAdmin(user.email) ? 'flex' : 'none';
+}
+
+// ── Inicialização ──
+(function initAuth() {
+  const user = getCurrentUser();
+  if (!user) {
+    showLoginScreen();
+  } else {
+    document.getElementById('app-wrapper').style.display = 'block';
+    document.getElementById('login-screen').style.display = 'none';
+    // Apply permissions after DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => applyPermissions(user));
+    } else {
+      applyPermissions(user);
+    }
+  }
+})();
+
+function showLoginScreen() {
+  document.getElementById('app-wrapper').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function doLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const err      = document.getElementById('login-error');
+
+  if (!email || !password) { err.textContent = 'Preencha e-mail e senha.'; err.style.display='block'; return; }
+
+  if (login(email, password)) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'block';
+    applyPermissions(getCurrentUser());
+  } else {
+    err.textContent = 'E-mail ou senha incorretos.';
+    err.style.display = 'block';
+    document.getElementById('login-password').value = '';
+  }
+}
+
+// ── Gerenciamento de usuários (só super admin) ──
+function openUserManager() {
+  const user = getCurrentUser();
+  if (!isSuperAdmin(user?.email)) return;
+  document.getElementById('user-manager-modal').style.display = 'flex';
+  renderUserList();
+}
+
+function closeUserManager() {
+  document.getElementById('user-manager-modal').style.display = 'none';
+}
+
+function renderUserList() {
+  const users = getUsers();
+  const list  = document.getElementById('um-list');
+  list.innerHTML = '';
+  users.forEach((u, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0f0f0';
+    row.innerHTML = `
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:#1a1a1a">${u.name}</div>
+        <div style="font-size:12px;color:#999">${u.email}</div>
+      </div>
+      <span style="background:${u.role==='admin'?'#fff0eb':'#f0f9ff'};color:${u.role==='admin'?'#E84E1B':'#0369a1'};font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid ${u.role==='admin'?'#fcd9c8':'#bae6fd'}">
+        ${u.role==='admin'?'Admin':'Atendimento'}
+      </span>
+      ${u.email !== SUPER_ADMIN ? `<button onclick="removeUser(${i})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:inherit">Remover</button>` : '<span style="font-size:11px;color:#ccc">Super Admin</span>'}
+    `;
+    list.appendChild(row);
+  });
+}
+
+function addUser() {
+  const name     = document.getElementById('um-name').value.trim();
+  const email    = document.getElementById('um-email').value.trim().toLowerCase();
+  const password = document.getElementById('um-password').value;
+  const role     = document.getElementById('um-role').value;
+  const err      = document.getElementById('um-error');
+
+  if (!name || !email || !password) { err.textContent='Preencha todos os campos.'; err.style.display='block'; return; }
+  if (!email.includes('@strada')) { err.textContent='Use um e-mail corporativo @strada.'; err.style.display='block'; return; }
+
+  const users = getUsers();
+  if (users.find(u => u.email === email)) { err.textContent='E-mail já cadastrado.'; err.style.display='block'; return; }
+
+  users.push({ email, name, role, password: btoa(password) });
+  saveUsers(users);
+  err.style.display = 'none';
+  document.getElementById('um-name').value = '';
+  document.getElementById('um-email').value = '';
+  document.getElementById('um-password').value = '';
+  renderUserList();
+}
+
+function removeUser(idx) {
+  if (!confirm('Remover este usuário?')) return;
+  const users = getUsers();
+  users.splice(idx, 1);
+  saveUsers(users);
+  renderUserList();
+}
 
 // Roda a detecção assim que a página carrega
 document.addEventListener('DOMContentLoaded', () => {

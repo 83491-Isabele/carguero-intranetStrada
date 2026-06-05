@@ -273,10 +273,16 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
       </div>
       <div style="margin-bottom:1.25rem;position:relative">
         <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Senha</label>
-        <input type="password" id="login-password" placeholder="••••••••"
-          style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s"
-          onkeydown="if(event.key==='Enter')doLogin()"
-          onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+        <div style="position:relative">
+          <input type="password" id="login-password" placeholder="••••••••"
+            style="width:100%;padding:11px 42px 11px 14px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s"
+            onkeydown="if(event.key==='Enter')doLogin()"
+            onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+          <button type="button" onclick="togglePwd('login-password',this)" tabindex="-1"
+            style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#aaa;line-height:1">
+            <svg id="eye-login-password" viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
       </div>
       <div id="login-error" style="display:none;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:1rem"></div>
       <button onclick="doLogin()" style="width:100%;padding:13px;background:#E84E1B;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#c43a10'" onmouseout="this.style.background='#E84E1B'">
@@ -341,6 +347,70 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
   </div>
 </div>
 
+<!-- MODAL ALTERAR SENHA -->
+<div id="change-password-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden">
+    <div style="background:#1a1a1a;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:30px;height:30px;background:#E84E1B;border-radius:7px;display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#fff"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <span style="color:#fff;font-size:14px;font-weight:600">Alterar Senha</span>
+      </div>
+      <button onclick="closeChangePassword()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:18px;line-height:1">✕</button>
+    </div>
+    <div style="padding:1.5rem">
+      <p style="font-size:13px;color:#999;margin-bottom:1.25rem">Altere a senha da sua conta. Use uma senha segura com pelo menos 6 caracteres.</p>
+
+      <div style="margin-bottom:1rem">
+        <label style="display:block;font-size:11px;font-weight:600;color:#777;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Senha atual</label>
+        <div style="position:relative">
+          <input type="password" id="cp-current" placeholder="••••••••"
+            style="width:100%;padding:10px 40px 10px 12px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none"
+            onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+          <button type="button" onclick="togglePwd('cp-current',this)" tabindex="-1"
+            style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#aaa;line-height:1">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <label style="display:block;font-size:11px;font-weight:600;color:#777;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Nova senha</label>
+        <div style="position:relative">
+          <input type="password" id="cp-new" placeholder="••••••••"
+            style="width:100%;padding:10px 40px 10px 12px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none"
+            onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+          <button type="button" onclick="togglePwd('cp-new',this)" tabindex="-1"
+            style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#aaa;line-height:1">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div style="margin-bottom:1.25rem">
+        <label style="display:block;font-size:11px;font-weight:600;color:#777;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Confirmar nova senha</label>
+        <div style="position:relative">
+          <input type="password" id="cp-confirm" placeholder="••••••••"
+            style="width:100%;padding:10px 40px 10px 12px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none"
+            onkeydown="if(event.key==='Enter')doChangePassword()"
+            onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
+          <button type="button" onclick="togglePwd('cp-confirm',this)" tabindex="-1"
+            style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#aaa;line-height:1">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="cp-error" style="display:none;background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:8px 12px;font-size:13px;margin-bottom:1rem"></div>
+      <div id="cp-success" style="display:none;background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;border-radius:7px;padding:8px 12px;font-size:13px;margin-bottom:1rem">✓ Senha alterada com sucesso!</div>
+
+      <div style="display:flex;gap:8px">
+        <button onclick="closeChangePassword()" style="flex:1;padding:10px;background:#f5f5f5;color:#555;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer">Cancelar</button>
+        <button onclick="doChangePassword()" style="flex:2;padding:10px;background:#E84E1B;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#c43a10'" onmouseout="this.style.background='#E84E1B'">Alterar senha</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- APP WRAPPER -->
 <div id="app-wrapper" style="display:none">
 <header>
@@ -357,6 +427,7 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
       <span id="user-name-badge">-</span>
     </div>
     <button id="btn-user-manager" onclick="openUserManager()" style="display:none;background:rgba(232,78,27,.2);border:1px solid rgba(232,78,27,.4);color:#ff7a50;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit">👥 Usuários</button>
+    <button onclick="openChangePassword()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit">🔒 Senha</button>
     <button onclick="logout()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit">Sair</button>
   </div>
 </header>
@@ -1521,6 +1592,74 @@ function doLogin() {
     err.style.display = 'block';
     document.getElementById('login-password').value = '';
   }
+}
+
+function togglePwd(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  btn.style.color = isHidden ? '#E84E1B' : '#aaa';
+  // Troca ícone: olho aberto / olho fechado
+  btn.querySelector('svg').innerHTML = isHidden
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+function openChangePassword() {
+  document.getElementById('cp-current').value = '';
+  document.getElementById('cp-new').value = '';
+  document.getElementById('cp-confirm').value = '';
+  document.getElementById('cp-error').style.display = 'none';
+  document.getElementById('cp-success').style.display = 'none';
+  document.getElementById('change-password-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('cp-current').focus(), 100);
+}
+
+function closeChangePassword() {
+  document.getElementById('change-password-modal').style.display = 'none';
+}
+
+function doChangePassword() {
+  const current = document.getElementById('cp-current').value;
+  const newPwd  = document.getElementById('cp-new').value;
+  const confirm = document.getElementById('cp-confirm').value;
+  const errEl   = document.getElementById('cp-error');
+  const okEl    = document.getElementById('cp-success');
+
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!current || !newPwd || !confirm) {
+    errEl.textContent = 'Preencha todos os campos.';
+    errEl.style.display = 'block'; return;
+  }
+  if (newPwd.length < 6) {
+    errEl.textContent = 'A nova senha deve ter pelo menos 6 caracteres.';
+    errEl.style.display = 'block'; return;
+  }
+  if (newPwd !== confirm) {
+    errEl.textContent = 'As senhas não conferem.';
+    errEl.style.display = 'block'; return;
+  }
+
+  const user  = getCurrentUser();
+  const users = getUsers();
+  const idx   = users.findIndex(u => u.email === user.email);
+
+  if (idx === -1 || users[idx].password !== btoa(current)) {
+    errEl.textContent = 'Senha atual incorreta.';
+    errEl.style.display = 'block'; return;
+  }
+
+  users[idx].password = btoa(newPwd);
+  saveUsers(users);
+
+  okEl.style.display = 'block';
+  document.getElementById('cp-current').value = '';
+  document.getElementById('cp-new').value = '';
+  document.getElementById('cp-confirm').value = '';
+
+  setTimeout(() => closeChangePassword(), 1800);
 }
 
 // ── Gerenciamento de usuários (só super admin) ──

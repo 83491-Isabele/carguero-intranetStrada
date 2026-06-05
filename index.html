@@ -1992,19 +1992,18 @@ async function refreshCard(cardId, cardEl) {
   btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor;animation:spin .7s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Atualizando...';
   try {
     const result = await callFlow(workerUrl, { card_id: cardId }, 'get_card');
-    const card = result.data?.data?.[0] || result.data?.data || result.data;
+    const raw  = result.data?.data;
+    const card = Array.isArray(raw) ? raw[0] : raw;
     if (card) {
-      const col = card.column_name || card.column || '';
-      const pill = cardEl.querySelector('.tc-header .status-pill');
-      const wfId2 = String(card.workflow_id || detectWorkflow(col));
-      if (pill) pill.outerHTML = statusPill(col, wfId2);
-      const kanban = cardEl.querySelector('.kanban-track');
-      if (kanban) kanban.outerHTML = kanbanProgress(col, wfId2);
-      const vals = cardEl.querySelectorAll('.td-val');
-      const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
-      if (vals[1]) vals[1].textContent = fmtDate(card.last_modified||card.updated_at);
-      if (vals[2]) vals[2].textContent = priorityLabels[card.priority] || '—';
-      if (vals[3]) vals[3].textContent = card.owner_user_name || card.owner || 'Não atribuído';
+      // Reconstrói o card inteiro com dados frescos
+      const wasOpen = cardEl.classList.contains('open');
+      const newCard = buildTicketCard(card);
+      if (wasOpen) newCard.classList.add('open');
+      cardEl.parentNode.replaceChild(newCard, cardEl);
+      // Flash verde para indicar atualização
+      newCard.style.outline = '2px solid #16a34a';
+      setTimeout(() => { newCard.style.outline = ''; }, 1200);
+      return; // saiu antes de restaurar btn (card foi substituído)
     }
   } catch(e) { console.warn(e); }
   btn.disabled = false;

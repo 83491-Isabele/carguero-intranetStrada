@@ -332,7 +332,7 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
     <div id="tab-form">
 
       <!-- CONFIG HIDDEN -->
-      <input type="hidden" id="cfg-apikey" value="JXpkGOXLAYY4I8E1HODw7OTQhhBQ8ssHp4sCdj3B"/>
+      <input type="hidden" id="cfg-apikey" value="gs4giXuqZ8e43KpB9HDLAf5JHgVK31QFas9bzNwi"/>
       <input type="hidden" id="cfg-boardid" value="95"/>
       <input type="hidden" id="cfg-lane" value=""/>
       <input type="hidden" id="cfg-emailjs-key" value=""/>
@@ -398,9 +398,105 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
                 <input type="text" id="f-ticket-ref" placeholder="Ex.: ATD-1234, INC-5678..."/>
               </div>
               <div class="field">
-                <label>Sistema / Produto afetado</label>
-                <input type="text" id="f-system" placeholder="Ex.: Portal, API, Carguero..."/>
+                <label>Squad Responsável</label>
+                <select id="f-squad">
+                  <option value="">Selecione o squad...</option>
+                  <option>Arquitetura</option>
+                  <option>Squad Frete</option>
+                  <option>Squad Produtos Financeiros</option>
+                  <option>Squad Expedição</option>
+                  <option>Segurança da Informação</option>
+                  <option>SRE</option>
+                  <option>N3</option>
+                  <option>Dados</option>
+                  <option>Squad Log</option>
+                  <option>Squad Foundation</option>
+                  <option>SIP - Gestão</option>
+                  <option>SIP - GRC</option>
+                  <option>SIP - Red</option>
+                  <option>Sip - Blue</option>
+                  <option>SIP - IAM</option>
+                  <option>SIP - Privacidade</option>
+                  <option>Infraestrutura</option>
+                </select>
               </div>
+            </div>
+            <div class="field">
+              <label>Aplicação</label>
+              <select id="f-application">
+                <option value="">Selecione a aplicação...</option>
+                <optgroup label="Strada Log">
+                  <option>Strada Log Plataforma</option>
+                  <option>Strada Log App</option>
+                  <option>Strada Log App Tracking</option>
+                  <option>Strada Log App Troca Notas</option>
+                  <option>Strada Log Backoffice</option>
+                  <option>Strada Log - Análise Cadastral</option>
+                  <option>Strada Log - Assessores</option>
+                  <option>Strada Log - Gestão de Locais</option>
+                  <option>Strada Log - Gestão de Lotes</option>
+                  <option>Strada Log - GR Terceiras</option>
+                  <option>Strada Log - Identity</option>
+                  <option>Strada Log - Match de Cargas</option>
+                  <option>Strada Log - Onboarding</option>
+                  <option>Strada Log - Plataforma</option>
+                  <option>Strada Log - Plataforma Admin</option>
+                  <option>Strada Log - Plataforma Embarcador</option>
+                  <option>Strada Log - Plataforma Frotista</option>
+                  <option>Strada Log - Tracking</option>
+                  <option>Strada Log - Troca Notas</option>
+                  <option>Strada Log - Troca Notas App</option>
+                  <option>Strada Log - Agendamento Automático</option>
+                  <option>Strada Log - API Carguero</option>
+                  <option>Strada Gestão da Rota (Tracking)</option>
+                </optgroup>
+                <optgroup label="Strada Frete">
+                  <option>Strada Frete</option>
+                  <option>Strada Frete 1.0</option>
+                  <option>Strada Frete 2.0</option>
+                  <option>Strada Frete API</option>
+                  <option>Strada Frete - Antecipação para Postos</option>
+                  <option>Strada Frete - Cartão Multi Saldo</option>
+                  <option>Strada Frete - VPO</option>
+                </optgroup>
+                <optgroup label="Strada Bank">
+                  <option>Strada Bank - App</option>
+                  <option>Strada Bank - Backoffice</option>
+                  <option>Strada Bank - Seguro Pessoal</option>
+                  <option>Strada Bank - Internet Banking</option>
+                  <option>Strada Bank - Antecipação para Motoristas</option>
+                </optgroup>
+                <optgroup label="Strada Risk">
+                  <option>Strada Risk</option>
+                  <option>Strada Risk - Portaria</option>
+                  <option>Strada Risk - Sistema de Monitoramento (SM)</option>
+                </optgroup>
+                <optgroup label="Strada Posto">
+                  <option>Strada Posto</option>
+                  <option>Strada Posto - Digitalização de Documentos</option>
+                  <option>Strada Posto - Pix na Conta</option>
+                </optgroup>
+                <optgroup label="Outros">
+                  <option>Strada BID</option>
+                  <option>Strada Conta Digital</option>
+                  <option>Strada Redes de Postos</option>
+                  <option>Strada Pass</option>
+                  <option>Strada Frota</option>
+                  <option>Strada Frontend Components (KM-0)</option>
+                  <option>Strada - HubNotifications</option>
+                  <option>Automação</option>
+                  <option>Banco de Dados</option>
+                  <option>Infraestrutura</option>
+                  <option>S.I. - Site Carguero</option>
+                  <option>S.I. - Site Strada Log</option>
+                  <option>Segurança da Informação</option>
+                  <option>DB-Oracle</option>
+                  <option>DB-Postgres</option>
+                  <option>DB-Mongo</option>
+                  <option>DB-Mysql</option>
+                  <option>DB-SQL</option>
+                </optgroup>
+              </select>
             </div>
             <div class="field">
               <label>Título do chamado <span class="req">*</span></label>
@@ -713,7 +809,8 @@ async function submitTicket() {
   const desc      = document.getElementById('f-desc').value.trim();
   const area      = document.getElementById('f-area').value;
   const phone     = document.getElementById('f-phone').value.trim();
-  const system    = document.getElementById('f-system').value.trim();
+  const squad     = document.getElementById('f-squad').value;
+  const application = document.getElementById('f-application').value;
   const ticketRef = document.getElementById('f-ticket-ref').value.trim();
   const urgency   = document.getElementById('f-urgency').value;
   const videoUrl  = document.getElementById('f-video-url').value.trim();
@@ -739,23 +836,23 @@ async function submitTicket() {
     `📋 **Solicitante:** ${name} (${email})\n` +
     `🏢 **Área:** ${area||'Não informado'}\n` +
     `📞 **Contato:** ${phone||'Não informado'}\n` +
-    `💻 **Sistema:** ${system||'Não informado'}\n` +
     `🏷️ **Categoria:** ${category}\n` +
-    (ticketRef?`🔗 **Ref. Ticket:** ${ticketRef}\n`:'') +
-    (urgency  ?`⏱ **Urgência:** ${urgencyLabel[urgency]}\n`:'') +
-    (videoUrl ?`🎬 **Vídeo:** ${videoUrl}\n`:'') +
+    (squad       ? `👥 **Squad Responsável:** ${squad}\n` : '') +
+    (application ? `💻 **Aplicação:** ${application}\n` : '') +
+    (ticketRef   ? `🔗 **Ref. Ticket:** ${ticketRef}\n` : '') +
+    (urgency     ? `⏱ **Urgência:** ${urgencyLabel[urgency]}\n` : '') +
+    (videoUrl    ? `🎬 **Vídeo:** ${videoUrl}\n` : '') +
     `\n---\n\n${desc}`;
 
   // Payload enviado ao Power Automate — ele repassa ao Businessmap
   const payload = {
-    apikey:      API_KEY,
     board_id:    BOARD_ID,
-    lane_id:     laneId ? parseInt(laneId) : undefined,
     title:       `[${category}] ${title}` + (ticketRef ? ` — Ref: ${ticketRef}` : ''),
     description: descFormatted,
     priority:    priorityMap[priority] || 'Medium',
     tags:        [category, area].filter(Boolean),
-    // anexos inline (imagens pequenas em base64)
+    squad:       squad       || undefined,
+    application: application || undefined,
     attachments: [],
     video_url:   videoUrl || undefined
   };
@@ -1043,7 +1140,7 @@ function renderDemoTickets(email, container) {
    Busca a estrutura do board e encontra o lane
    cujo nome contém "Backlog" + "Demanda" ou "Atendimento".
 ═══════════════════════════════════════════════════ */
-const API_KEY  = 'JXpkGOXLAYY4I8E1HODw7OTQhhBQ8ssHp4sCdj3B';
+const API_KEY  = 'gs4giXuqZ8e43KpB9HDLAf5JHgVK31QFas9bzNwi';
 const BOARD_ID = 95;
 let   resolvedLaneId   = null;
 let   resolvedColumnId = null;

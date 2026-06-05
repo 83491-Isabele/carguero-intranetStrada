@@ -963,93 +963,43 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
     ════════════════════════════════════════ -->
     <div id="tab-track" style="display:none">
 
-      <!-- Sub-abas: Meus Chamados / Board -->
-      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.25rem;background:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:0 .25rem">
-        <button id="track-sub-list" onclick="switchTrackView('list')"
-          style="padding:.65rem 1.25rem;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px">
-          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Meus Chamados
-        </button>
-        <button id="track-sub-board" onclick="switchTrackView('board')"
-          style="padding:.65rem 1.25rem;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px">
-          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Board Kanban
-        </button>
+      <!-- BUSCA -->
+      <div class="search-card">
+        <h2>Consultar chamados</h2>
+        <p>Busque pelo <strong>nome do solicitante</strong>, <strong>squad responsável</strong> ou pelo <strong>número do ticket</strong> para acompanhar o status em tempo real.</p>
+        <div style="display:flex;gap:0;margin-bottom:1rem;border-bottom:2px solid var(--border)">
+          <button id="search-tab-email" onclick="switchSearchTab('email')"
+            style="padding:7px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif">
+            👤 Por nome / squad
+          </button>
+          <button id="search-tab-id" onclick="switchSearchTab('id')"
+            style="padding:7px 16px;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif">
+            🔢 Por ID do ticket
+          </button>
+        </div>
+        <div id="search-by-email">
+          <div class="search-row">
+            <input type="text" id="track-email" placeholder="Ex.: Isabele, Squad Foundation, N3..." onkeydown="if(event.key==='Enter')searchTickets()"/>
+            <button class="btn-search" id="btn-search" onclick="searchTickets()">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Buscar
+            </button>
+          </div>
+        </div>
+        <div id="search-by-id" style="display:none">
+          <div class="search-row">
+            <input type="text" id="track-ticket-id" placeholder="Ex.: 24042" onkeydown="if(event.key==='Enter')searchByTicketId()"/>
+            <button class="btn-search" id="btn-search-id" onclick="searchByTicketId()">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Buscar
+            </button>
+          </div>
+        </div>
+        <div id="track-status" style="display:none;margin-top:.75rem;font-size:13px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid"></div>
       </div>
 
-      <!-- ── VISÃO LISTA ── -->
-      <div id="track-view-list">
-        <div class="search-card">
-          <h2>Consultar chamados</h2>
-          <p>Busque pelo <strong>nome do solicitante</strong>, <strong>squad responsável</strong> ou pelo <strong>número do ticket</strong> para acompanhar em tempo real.</p>
-          <div style="display:flex;gap:0;margin-bottom:1rem;border-bottom:2px solid var(--border)">
-            <button id="search-tab-email" onclick="switchSearchTab('email')"
-              style="padding:7px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif">
-              👤 Por nome / squad
-            </button>
-            <button id="search-tab-id" onclick="switchSearchTab('id')"
-              style="padding:7px 16px;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif">
-              🔢 Por ID do ticket
-            </button>
-          </div>
-          <div id="search-by-email">
-            <div class="search-row">
-              <input type="text" id="track-email" placeholder="Ex.: Isabele, Squad Foundation, N3..." onkeydown="if(event.key==='Enter')searchTickets()"/>
-              <button class="btn-search" id="btn-search" onclick="searchTickets()">
-                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                Buscar
-              </button>
-            </div>
-          </div>
-          <div id="search-by-id" style="display:none">
-            <div class="search-row">
-              <input type="text" id="track-ticket-id" placeholder="Ex.: 24042" onkeydown="if(event.key==='Enter')searchByTicketId()"/>
-              <button class="btn-search" id="btn-search-id" onclick="searchByTicketId()">
-                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                Buscar
-              </button>
-            </div>
-          </div>
-          <div id="track-status" style="display:none;margin-top:.75rem;font-size:13px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid"></div>
-        </div>
-        <div id="tickets-list"></div>
-      </div>
-
-      <!-- ── VISÃO BOARD ── -->
-      <div id="track-view-board" style="display:none">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.25rem;margin-bottom:1rem">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.85rem">
-            <div style="flex:1;min-width:160px">
-              <h2 style="font-size:14px;font-weight:600;margin-bottom:2px">Board Squad Foundation</h2>
-              <p style="font-size:11px;color:var(--text-3)" id="board-subtitle">Board #95</p>
-            </div>
-            <div style="position:relative">
-              <svg viewBox="0 0 24 24" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;fill:none;stroke:#aaa;stroke-width:2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" id="board-search" placeholder="Buscar ou digitar #ID..." oninput="filterBoardCards()"
-                style="padding:7px 10px 7px 28px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:190px"
-                onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='var(--border)'"/>
-            </div>
-            <button onclick="loadBoard()" style="padding:7px 10px;background:#f5f5f5;color:#555;border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Inter',sans-serif">
-              <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-              Atualizar
-            </button>
-          </div>
-          <div style="display:flex;gap:0;border-bottom:2px solid #f0f0f0">
-            <button onclick="switchWorkflow('290')" id="wf-tab-290" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">📥 Backlog Atendimento</button>
-            <button onclick="switchWorkflow('270')" id="wf-tab-270" style="padding:6px 14px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">🔧 N3</button>
-            <button onclick="switchWorkflow('266')" id="wf-tab-266" style="padding:6px 14px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">📋 Cards workflow</button>
-            <div style="flex:1"></div>
-            <span id="board-card-count" style="font-size:11px;color:#aaa;padding:6px 0;align-self:center"></span>
-          </div>
-        </div>
-        <div id="board-container" style="overflow-x:auto;padding-bottom:1rem">
-          <div id="board-loading" style="text-align:center;padding:3rem;color:var(--text-3)">
-            <div class="spinner-dark" style="margin:0 auto 1rem"></div>
-            <p style="font-size:13px">Carregando board...</p>
-          </div>
-          <div id="board-columns" style="display:none;display:flex;gap:10px;min-width:max-content"></div>
-        </div>
-      </div>
+      <!-- RESULTADOS -->
+      <div id="tickets-list"></div>
 
       <!-- MODAL DETALHES DO CARD + RESPOSTA -->
       <div id="card-detail-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:8888;align-items:flex-start;justify-content:center;padding:1.5rem;overflow-y:auto">
@@ -1824,22 +1774,79 @@ function colToStatus(col) {
   return 'unknown';
 }
 
-function statusPill(col) {
-  const s = colToStatus(col);
-  const labels = {backlog:'Backlog',requested:'Requested',inprogress:'In Progress',done:'Done',unknown:col||'Desconhecido'};
-  return `<span class="status-pill sp-${s}"><span class="sp-dot"></span>${labels[s]}</span>`;
+// Mapas de colunas por workflow com labels e cores
+const WF_STEPS = {
+  '290': [
+    { key:'Backlog',        label:'Backlog',      color:'#6366f1' },
+    { key:'Requested',      label:'Requested',    color:'#3b82f6' },
+    { key:'In Progress',    label:'In Progress',  color:'#f59e0b' },
+    { key:'Done',           label:'Done',         color:'#10b981' },
+  ],
+  '270': [
+    { key:'Backlog N3',        label:'Backlog N3',     color:'#6366f1' },
+    { key:'Requested N3',      label:'Requested N3',   color:'#3b82f6' },
+    { key:'Refinament',        label:'Refinament',     color:'#8b5cf6' },
+    { key:'Ready to Start N3', label:'Ready to Start', color:'#f59e0b' },
+    { key:'In Progress N3',    label:'In Progress',    color:'#f97316' },
+    { key:'In Test N3',        label:'In Test',        color:'#06b6d4' },
+    { key:'Homologation N3',   label:'Homologation',   color:'#84cc16' },
+    { key:'Done N3',           label:'Done N3',        color:'#10b981' },
+  ],
+  '266': [
+    { key:'Backlog',              label:'Backlog',        color:'#6366f1' },
+    { key:'Requested',            label:'Requested',      color:'#3b82f6' },
+    { key:'Refinament',           label:'Refinament',     color:'#8b5cf6' },
+    { key:'Ready to Start',       label:'Ready to Start', color:'#f59e0b' },
+    { key:'In Progress',          label:'In Progress',    color:'#f97316' },
+    { key:'DevBox | In Test',     label:'DevBox/Test',    color:'#06b6d4' },
+    { key:'Homologation',         label:'Homologation',   color:'#84cc16' },
+    { key:'Ready To Regressive',  label:'Regressive',     color:'#eab308' },
+    { key:'In Regressive',        label:'In Regressive',  color:'#f97316' },
+    { key:'Deploy',               label:'Deploy',         color:'#ec4899' },
+    { key:'Done',                 label:'Done',           color:'#10b981' },
+  ]
+};
+
+// Detecta qual workflow baseado no nome da coluna
+function detectWorkflow(colName) {
+  if (!colName) return '290';
+  const col = colName.toLowerCase();
+  if (col.includes('n3')) return '270';
+  if (col.includes('refinament') || col.includes('devbox') || col.includes('regressive') || col.includes('deploy')) return '266';
+  return '290';
 }
 
-function kanbanProgress(col) {
-  const current = colToStatus(col);
-  const steps   = ['backlog','requested','inprogress','done'];
-  const labels  = ['Backlog','Requested','In Progress','Done'];
-  const idx     = steps.indexOf(current);
-  return `<div class="kanban-track">${steps.map((s,i)=>{
+// Encontra o step atual nas colunas do workflow
+function findStep(colName, wfId) {
+  const steps = WF_STEPS[wfId] || WF_STEPS['290'];
+  const col = (colName || '').toLowerCase();
+  const idx = steps.findIndex(s => col.includes(s.key.toLowerCase()) || s.key.toLowerCase().includes(col));
+  return { steps, idx: idx >= 0 ? idx : 0 };
+}
+
+function statusPill(col, wfId) {
+  const resolvedWf = wfId || detectWorkflow(col);
+  const { steps, idx } = findStep(col, resolvedWf);
+  const step = steps[idx] || steps[0];
+  return `<span class="status-pill" style="background:${step.color}22;color:${step.color};border-color:${step.color}44">
+    <span class="sp-dot" style="background:${step.color}"></span>${step.label}
+  </span>`;
+}
+
+function kanbanProgress(col, wfId) {
+  const resolvedWf = wfId || detectWorkflow(col);
+  const { steps, idx } = findStep(col, resolvedWf);
+  const stepsHtml = steps.map((s, i) => {
     const state = i < idx ? 'done' : i === idx ? 'active' : '';
     const check = i < idx ? `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>` : '';
-    return `<div class="kt-step ${state}"><div class="kt-dot">${check}</div><div class="kt-label">${labels[i]}</div></div>`;
-  }).join('')}</div>`;
+    const dotStyle = i <= idx ? `style="background:${s.color};border-color:${s.color}"` : '';
+    const labelStyle = i === idx ? `style="color:${s.color};font-weight:700"` : '';
+    return `<div class="kt-step ${state}">
+      <div class="kt-dot" ${dotStyle}>${check}</div>
+      <div class="kt-label" ${labelStyle}>${s.label}</div>
+    </div>`;
+  }).join('');
+  return `<div class="kanban-track">${stepsHtml}</div>`;
 }
 
 function fmtDate(d) {
@@ -1872,67 +1879,24 @@ function switchSearchTab(tab) {
 async function searchByTicketId() {
   const ticketId = document.getElementById('track-ticket-id').value.trim().replace(/\D/g,'');
   const list = document.getElementById('tickets-list');
-
   if (!ticketId) { showTrackMsg('Informe o número do ticket.', 'error'); return; }
-
   const workerUrl = localStorage.getItem('pa_create_url') || '';
-  if (!workerUrl) { showTrackMsg('Configure a URL do Worker primeiro — clique em ⚙ Configurar.', 'error'); return; }
-
+  if (!workerUrl) { showTrackMsg('Configure a URL do Worker primeiro.', 'error'); return; }
   document.getElementById('btn-search-id').disabled = true;
-  list.innerHTML = `<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando ticket #${ticketId}...</p></div>`;
+  list.innerHTML = '<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando ticket #'+ticketId+'...</p></div>';
   document.getElementById('track-status').style.display = 'none';
-
   try {
     const result = await callFlow(workerUrl, { card_id: parseInt(ticketId) }, 'get_card');
-
-    if (!result.ok || result.data?.error) {
-      throw new Error(result.data?.error?.message || result.data?.message || 'Ticket não encontrado');
-    }
-
-    const card = result.data?.data || result.data;
-    const cardArr = Array.isArray(card) ? card[0] : card;
-
-    if (!cardArr) throw new Error('Ticket não encontrado');
-
+    if (!result.ok || result.data?.error) throw new Error(result.data?.error?.message || 'Ticket não encontrado');
+    const raw = result.data?.data;
+    const c = Array.isArray(raw) ? raw[0] : raw;
+    if (!c) throw new Error('Ticket não encontrado');
     document.getElementById('btn-search-id').disabled = false;
-    showTrackMsg(`Ticket #${ticketId} encontrado`, 'success');
+    showTrackMsg('Ticket #' + ticketId + ' encontrado', 'success');
     list.innerHTML = '';
-
-    const col    = cardArr.column_name || cardArr.column || '';
-    const cardId = cardArr.card_id || ticketId;
-    const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
-
-    const div = document.createElement('div');
-    div.className = 'ticket-card open';
-    div.innerHTML = `
-      <div class="tc-header" onclick="toggleCard(this.closest('.ticket-card'))">
-        <span class="tc-id">#${cardId}</span>
-        ${statusPill(col)}
-        <span class="tc-title" title="${(cardArr.title||'').replace(/"/g,'&quot;')}">${cardArr.title||'(sem título)'}</span>
-        <svg class="tc-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div class="tc-body">
-        ${kanbanProgress(col)}
-        <div class="td-grid">
-          <div class="td-item"><div class="td-label">Criado em</div><div class="td-val">${fmtDate(cardArr.created_at)}</div></div>
-          <div class="td-item"><div class="td-label">Atualizado</div><div class="td-val">${fmtDate(cardArr.last_modified||cardArr.updated_at)}</div></div>
-          <div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">${priorityLabels[cardArr.priority]||'—'}</div></div>
-          <div class="td-item"><div class="td-label">Responsável</div><div class="td-val">${cardArr.owner_user_name||cardArr.owner||'Não atribuído'}</div></div>
-        </div>
-        ${cardArr.description ? `<div class="tc-desc">${cardArr.description.replace(/</g,'&lt;').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>` : ''}
-        <div class="tc-actions">
-          <a href="https://stradaz3.businessmap.io/ctrl_board/95/cards/${cardId}/details/" target="_blank">
-            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
-            Abrir no board
-          </a>
-          <button onclick="refreshCard(${cardId}, this.closest('.ticket-card'))">
-            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Atualizar status
-          </button>
-        </div>
-      </div>`;
-    list.appendChild(div);
-
+    const el = buildTicketCard(c);
+    el.classList.add('open');
+    list.appendChild(el);
   } catch(err) {
     document.getElementById('btn-search-id').disabled = false;
     list.innerHTML = '';
@@ -1941,94 +1905,72 @@ async function searchByTicketId() {
 }
 
 async function searchTickets() {
-  const name   = document.getElementById('track-email').value.trim();
-  const list   = document.getElementById('tickets-list');
-
+  const name = document.getElementById('track-email').value.trim();
+  const list = document.getElementById('tickets-list');
   if (!name) { showTrackMsg('Informe o nome do solicitante.', 'error'); return; }
-
-  document.getElementById('btn-search').disabled = true;
-  list.innerHTML = `<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando chamados de "${name}"...</p></div>`;
-  document.getElementById('track-status').style.display = 'none';
-
   const workerUrl = localStorage.getItem('pa_create_url') || '';
-
+  if (!workerUrl) { showTrackMsg('Configure a URL do Worker primeiro.', 'error'); return; }
+  document.getElementById('btn-search').disabled = true;
+  list.innerHTML = '<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando chamados de "'+name+'"...</p></div>';
+  document.getElementById('track-status').style.display = 'none';
   try {
-    let cards = [];
-
-    if (!workerUrl) throw new Error('no-worker');
-
-    // Busca via Worker por nome do solicitante
     const result = await callFlow(workerUrl, { query: name, board_id: BOARD_ID }, 'search_cards');
-
     if (!result.ok) throw new Error(result.data?.message || result.data?.error || 'Erro ' + result.status);
-
-    cards = result.data?.cards || result.data?.data?.cards || result.data || [];
-
+    const raw = result.data?.cards || result.data?.data?.cards || result.data?.data || result.data || [];
+    const cards = Array.isArray(raw) ? raw : [];
     document.getElementById('btn-search').disabled = false;
-
-    if (!Array.isArray(cards) || cards.length === 0) {
-      list.innerHTML = `<div class="state-box">
-        <div class="sb-icon" style="background:#f1f5f9"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:#94a3b8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-        <h3>Nenhum chamado encontrado</h3>
-        <p>Não encontramos tickets do solicitante <strong>"${name}"</strong> no board.</p>
-      </div>`;
+    if (cards.length === 0) {
+      list.innerHTML = '<div class="state-box"><div class="sb-icon" style="background:#f1f5f9"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:#94a3b8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><h3>Nenhum chamado encontrado</h3><p>Não encontramos tickets para <strong>"'+name+'"</strong>.</p></div>';
       return;
     }
-
-    showTrackMsg(`${cards.length} chamado(s) encontrado(s) para "${name}"`, 'success');
+    showTrackMsg(cards.length + ' chamado(s) encontrado(s) para "' + name + '"', 'success');
     list.innerHTML = '';
-    cards.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
-
-    cards.forEach((card, idx) => {
-      const col    = card.column_name || card.column || '';
-      const cardId = card.card_id || card.id || '—';
-      const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
-      const div = document.createElement('div');
-      div.className = 'ticket-card';
-      div.innerHTML = `
-        <div class="tc-header" onclick="toggleCard(this.closest('.ticket-card'))">
-          <span class="tc-id">#${cardId}</span>
-          ${statusPill(col)}
-          <span class="tc-title" title="${(card.title||'').replace(/"/g,'&quot;')}">${card.title||'(sem título)'}</span>
-          <svg class="tc-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-        <div class="tc-body">
-          ${kanbanProgress(col)}
-          <div class="td-grid">
-            <div class="td-item"><div class="td-label">Criado em</div><div class="td-val">${fmtDate(card.created_at)}</div></div>
-            <div class="td-item"><div class="td-label">Atualizado</div><div class="td-val">${fmtDate(card.last_modified||card.updated_at)}</div></div>
-            <div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">${priorityLabels[card.priority]||'—'}</div></div>
-            <div class="td-item"><div class="td-label">Responsável</div><div class="td-val">${card.owner_user_name||card.owner||'Não atribuído'}</div></div>
-          </div>
-          ${card.description ? `<div class="tc-desc">${card.description.replace(/</g,'&lt;').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>` : ''}
-          <div class="tc-actions">
-            <a href="https://stradaz3.businessmap.io/ctrl_board/95/cards/${cardId}/details/" target="_blank">
-              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
-              Ver no board
-            </a>
-            <button onclick="refreshCard(${cardId}, this.closest('.ticket-card'))">
-              <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-              Atualizar status
-            </button>
-          </div>
-        </div>`;
-      list.appendChild(div);
-      if (idx === 0) div.classList.add('open');
+    cards.sort(function(a,b){ return new Date(b.created_at||0) - new Date(a.created_at||0); });
+    cards.forEach(function(card, idx) {
+      const el = buildTicketCard(card);
+      if (idx === 0) el.classList.add('open');
+      list.appendChild(el);
     });
-
   } catch(err) {
     document.getElementById('btn-search').disabled = false;
-    if (err.message === 'no-worker') {
-      showTrackMsg('Configure a URL do Worker primeiro — clique em ⚙ Configurar.', 'error');
-      list.innerHTML = '';
-    } else if (err.message.includes('fetch') || err.message.includes('Failed')) {
-      showTrackMsg('Erro de rede. Verifique a URL do Worker.', 'error'); list.innerHTML = '';
-    } else {
-      list.innerHTML = '';
-      showTrackMsg('Erro ao buscar chamados: ' + err.message, 'error');
-    }
+    list.innerHTML = '';
+    showTrackMsg('Erro ao buscar chamados: ' + err.message, 'error');
   }
 }
+
+function buildTicketCard(card) {
+  const col    = card.column_name || card.column || '';
+  const wfId   = String(card.workflow_id || detectWorkflow(col));
+  const cardId = card.card_id || card.id || '—';
+  const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
+  const div = document.createElement('div');
+  div.className = 'ticket-card';
+  const desc = card.description || '';
+  const descHtml = desc.replace(/</g,'&lt;').replace(/\n/g,'<br>');
+  const descShort = desc.length > 400 ? descHtml.substring(0,400) + '…' : descHtml;
+  div.innerHTML =
+    '<div class="tc-header" onclick="toggleCard(this.closest(\'.ticket-card\'))">'
+    + '<span class="tc-id">#'+cardId+'</span>'
+    + statusPill(col, wfId)
+    + '<span class="tc-title" title="'+(card.title||'').replace(/"/g,'&quot;')+'">'+(card.title||'(sem título)')+'</span>'
+    + '<svg class="tc-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'
+    + '</div>'
+    + '<div class="tc-body">'
+    + kanbanProgress(col, wfId)
+    + '<div class="td-grid">'
+    + '<div class="td-item"><div class="td-label">Criado em</div><div class="td-val">'+fmtDate(card.created_at)+'</div></div>'
+    + '<div class="td-item"><div class="td-label">Atualizado</div><div class="td-val">'+fmtDate(card.last_modified||card.updated_at)+'</div></div>'
+    + '<div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">'+(priorityLabels[card.priority]||'—')+'</div></div>'
+    + '<div class="td-item"><div class="td-label">Responsável</div><div class="td-val">'+(card.owner_user_name||card.owner||'Não atribuído')+'</div></div>'
+    + '</div>'
+    + (desc ? '<div class="tc-desc">'+descShort+'</div>' : '')
+    + '<div class="tc-actions">'
+    + '<a href="https://stradaz3.businessmap.io/ctrl_board/95/cards/'+cardId+'/details/" target="_blank"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>Ver no board</a>'
+    + '<button onclick="refreshCard('+cardId+', this.closest(\'.ticket-card\'))"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Atualizar status</button>'
+    + '</div></div>';
+  return div;
+}
+
 
 function showTrackMsg(msg,type){
   const el=document.getElementById('track-status');
@@ -2054,9 +1996,10 @@ async function refreshCard(cardId, cardEl) {
     if (card) {
       const col = card.column_name || card.column || '';
       const pill = cardEl.querySelector('.tc-header .status-pill');
-      if (pill) pill.outerHTML = statusPill(col);
+      const wfId2 = String(card.workflow_id || detectWorkflow(col));
+      if (pill) pill.outerHTML = statusPill(col, wfId2);
       const kanban = cardEl.querySelector('.kanban-track');
-      if (kanban) kanban.outerHTML = kanbanProgress(col);
+      if (kanban) kanban.outerHTML = kanbanProgress(col, wfId2);
       const vals = cardEl.querySelectorAll('.td-val');
       const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
       if (vals[1]) vals[1].textContent = fmtDate(card.last_modified||card.updated_at);

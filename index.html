@@ -269,9 +269,10 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
         <input type="email" id="login-email" placeholder="seu.nome@strada.log.br"
           style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s"
           onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()"
+            onblur="checkEmailNeedsPassword(this.value)"
           onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='#e8e8e8'"/>
       </div>
-      <div style="margin-bottom:1.25rem;position:relative">
+      <div style="margin-bottom:1.25rem;position:relative" id="password-field">
         <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Senha</label>
         <div style="position:relative">
           <input type="password" id="login-password" placeholder="••••••••"
@@ -1624,15 +1625,32 @@ const CONFIG_ADMINS = [
 // Usuários pré-cadastrados (senha hash simples via btoa)
 function getUsers() {
   const stored = localStorage.getItem('strada_users');
-  if (stored) return JSON.parse(stored);
-  // Usuários padrão iniciais
-  const defaults = [
-    { email: 'isabele.aquino@strada.log.br',  name: 'Isabele Aquino',   role: 'admin', password: encode('strada@2024') },
-    { email: 'paula.calefi@strada.log.br',    name: 'Paula Calefi',     role: 'admin', password: encode('strada@2024') },
-    { email: 'guilherme.cruz@strada.log.br',  name: 'Guilherme Cruz',   role: 'admin', password: encode('strada@2024') },
-  ];
+  if (stored) {
+    // Garante que usuários padrão sempre existam mesmo se localStorage já tem dados
+    const users = JSON.parse(stored);
+    const defaults = getDefaultUsers();
+    let changed = false;
+    defaults.forEach(d => {
+      if (!users.find(u => u.email === d.email)) {
+        users.push(d);
+        changed = true;
+      }
+    });
+    if (changed) localStorage.setItem('strada_users', JSON.stringify(users));
+    return users;
+  }
+  const defaults = getDefaultUsers();
   localStorage.setItem('strada_users', JSON.stringify(defaults));
   return defaults;
+}
+
+function getDefaultUsers() {
+  return [
+    { email: 'isabele.aquino@strada.log.br',  name: 'Isabele Aquino',   role: 'admin', active: true, password: encode('strada@2024') },
+    { email: 'paula.calefi@strada.log.br',    name: 'Paula Calefi',     role: 'admin', active: true, password: encode('strada@2024') },
+    { email: 'guilherme.cruz@strada.log.br',  name: 'Guilherme Cruz',   role: 'admin', active: true, password: encode('strada@2024') },
+    { email: 'monica.campos@strada.log.br',   name: 'Monica Campos',    role: 'admin', active: true, password: encode('strada@2024') },
+  ];
 }
 
 function saveUsers(users) {
@@ -1644,18 +1662,36 @@ function getCurrentUser() {
   return s ? JSON.parse(s) : null;
 }
 
+// E-mails que EXIGEM senha para logar
+const REQUIRE_PASSWORD = [
+  'isabele.aquino@strada.log.br',
+  'paula.calefi@strada.log.br'
+];
+
 function login(email, password) {
   const users = getUsers();
-  const user  = users.find(u => {
-    if (u.email.toLowerCase() !== email.toLowerCase()) return false;
-    if (u.active === false) return false; // usuário inativo
-    try { if (u.password === encode(password)) return true; } catch {}
-    try { if (u.password === btoa(password)) return true; } catch {}
-    return false;
-  });
+  const emailLower = email.toLowerCase();
+  const user = users.find(u => u.email.toLowerCase() === emailLower);
+
   if (!user) return false;
-  localStorage.setItem('strada_session', JSON.stringify({ email: user.email, name: user.name, role: user.role }));
-  return true;
+  if (user.active === false) return false;
+
+  // Usuários sem senha — só e-mail
+  if (!REQUIRE_PASSWORD.includes(emailLower)) {
+    localStorage.setItem('strada_session', JSON.stringify({ email: user.email, name: user.name, role: user.role }));
+    return true;
+  }
+
+  // Paula e Isabele — exigem senha
+  try { if (user.password === encode(password)) {
+    localStorage.setItem('strada_session', JSON.stringify({ email: user.email, name: user.name, role: user.role }));
+    return true;
+  }} catch {}
+  try { if (user.password === btoa(password)) {
+    localStorage.setItem('strada_session', JSON.stringify({ email: user.email, name: user.name, role: user.role }));
+    return true;
+  }} catch {}
+  return false;
 }
 
 function logout() {
@@ -1707,19 +1743,31 @@ function showLoginScreen() {
   document.getElementById('login-screen').style.display = 'flex';
 }
 
+function checkEmailNeedsPassword(email) {
+  const needsPwd = REQUIRE_PASSWORD.includes(email.toLowerCase().trim());
+  const pwdField = document.getElementById('password-field');
+  if (pwdField) {
+    pwdField.style.display = needsPwd ? 'block' : 'none';
+    if (!needsPwd) document.getElementById('login-password').value = '';
+  }
+}
+
 function doLogin() {
   const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   const err      = document.getElementById('login-error');
 
-  if (!email || !password) { err.textContent = 'Preencha e-mail e senha.'; err.style.display='block'; return; }
+  if (!email) { err.textContent = 'Informe seu e-mail.'; err.style.display='block'; return; }
+
+  const needsPwd = REQUIRE_PASSWORD.includes(email.toLowerCase());
+  if (needsPwd && !password) { err.textContent = 'Informe sua senha.'; err.style.display='block'; return; }
 
   if (login(email, password)) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
     applyPermissions(getCurrentUser());
   } else {
-    err.textContent = 'E-mail ou senha incorretos.';
+    err.textContent = needsPwd ? 'Senha incorreta.' : 'E-mail não cadastrado ou conta inativa.';
     err.style.display = 'block';
     document.getElementById('login-password').value = '';
   }

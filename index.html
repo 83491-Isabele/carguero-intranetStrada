@@ -4,11 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Central de Atendimento — Strada</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --brand:#1a3a5c;--brand-mid:#2563a8;--brand-light:#dbeafe;--accent:#e85d26;
+  --brand:#1a1a1a;--brand-mid:#2563a8;--brand-light:#dbeafe;--accent:#e85d26;
   --surface:#f8f9fb;--surface-2:#ffffff;--border:#e2e6ec;
   --text:#0f1923;--text-2:#4b5a6e;--text-3:#8a97a8;
   --success:#16a34a;--success-bg:#dcfce7;
@@ -17,7 +17,7 @@
   --radius:12px;--radius-sm:8px;
   --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.05);
 }
-body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 
 /* HEADER */
 header{background:var(--brand);padding:0 2.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
@@ -27,18 +27,18 @@ header{background:var(--brand);padding:0 2.5rem;height:64px;display:flex;align-i
 .header-badge{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.18)}
 
 /* HERO */
-.hero{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);padding:2rem 2.5rem 0;text-align:center;color:#fff}
-.hero-label{display:inline-block;background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:.6rem}
+.hero{background:linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 60%,#3a1a10 100%);padding:2rem 2.5rem 0;text-align:center;color:#fff}
+.hero-label{display:inline-block;background:rgba(232,78,27,.25);color:#ff7f5c;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:.6rem;border:1px solid rgba(232,78,27,.4)}
 .hero h1{font-family:'DM Serif Display',serif;font-size:clamp(24px,4vw,36px);font-weight:400;line-height:1.15;margin-bottom:.5rem}
-.hero h1 em{font-style:italic;color:#fbbf24}
+.hero h1 em{font-style:italic;color:#E84E1B}
 .hero p{font-size:14px;color:rgba(255,255,255,.75);max-width:480px;margin:0 auto .1rem;line-height:1.6}
 
 /* TABS NAV */
-.tabs-nav{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-mid) 100%);display:flex;justify-content:center;padding:0 2rem;gap:0}
-.tab-btn{padding:.85rem 1.75rem;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,.6);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px}
+.tabs-nav{background:#1a1a1a;display:flex;justify-content:center;padding:0 2rem;gap:0;border-bottom:3px solid #E84E1B}
+.tab-btn{padding:.85rem 1.75rem;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,.6);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px}
 .tab-btn svg{width:15px;height:15px;fill:currentColor;opacity:.7}
 .tab-btn:hover{color:rgba(255,255,255,.9)}
-.tab-btn.active{color:#fff;border-bottom-color:#fbbf24;font-weight:600}
+.tab-btn.active{color:#fff;border-bottom-color:#E84E1B;font-weight:600}
 .tab-btn.active svg{opacity:1}
 
 /* STEPS BAR */
@@ -46,12 +46,12 @@ header{background:var(--brand);padding:0 2.5rem;height:64px;display:flex;align-i
 .steps{display:flex;max-width:640px;width:100%}
 .step{flex:1;display:flex;flex-direction:column;align-items:center;padding:.8rem .5rem;gap:5px;position:relative}
 .step:not(:last-child)::after{content:'';position:absolute;top:20px;right:-50%;width:100%;height:2px;background:var(--border);z-index:0}
-.step.done:not(:last-child)::after{background:var(--brand-mid)}
+.step.done:not(:last-child)::after{background:#E84E1B}
 .step-num{width:26px;height:26px;border-radius:50%;background:var(--border);color:var(--text-3);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;transition:all .3s}
-.step.active .step-num{background:var(--brand-mid);color:#fff}
+.step.active .step-num{background:#E84E1B;color:#fff}
 .step.done .step-num{background:var(--success);color:#fff}
 .step-label{font-size:11px;color:var(--text-3);font-weight:500;text-align:center}
-.step.active .step-label{color:var(--brand-mid)}
+.step.active .step-label{color:#E84E1B}
 .step.done .step-label{color:var(--success)}
 
 /* MAIN */
@@ -64,7 +64,7 @@ main{flex:1;padding:2rem 1.5rem 4rem;display:flex;justify-content:center}
 .panel-header{padding:.9rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:#fafbfc}
 .panel-icon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .panel-icon svg{width:15px;height:15px}
-.panel-icon.blue{background:var(--brand-light)}.panel-icon.blue svg{fill:var(--brand-mid)}
+.panel-icon.blue{background:#fff0eb}.panel-icon.blue svg{fill:#E84E1B}
 .panel-icon.orange{background:#fff3e0}.panel-icon.orange svg{fill:#e65100}
 .panel-icon.green{background:#e8f5e9}.panel-icon.green svg{fill:#2e7d32}
 .panel-icon.purple{background:#f3e8ff}.panel-icon.purple svg{fill:#7c3aed}
@@ -81,10 +81,10 @@ label .req{color:var(--accent);margin-left:2px}
 label .hint{font-weight:400;color:var(--text-3);font-size:12px;margin-left:4px}
 input[type=text],input[type=email],input[type=tel],select,textarea{
   width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
-  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fff;
+  font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:#fff;
   transition:border-color .2s,box-shadow .2s;outline:none;appearance:none
 }
-input:focus,select:focus,textarea:focus{border-color:var(--brand-mid);box-shadow:0 0 0 3px rgba(37,99,168,.1)}
+input:focus,select:focus,textarea:focus{border-color:#E84E1B;box-shadow:0 0 0 3px rgba(232,78,27,.1)}
 textarea{resize:vertical;min-height:90px;line-height:1.5}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a97a8' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -129,15 +129,15 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .config-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
 /* SUBMIT */
-.btn-submit{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-submit:hover{background:#c94e1e}
+.btn-submit{width:100%;padding:14px;background:#E84E1B;color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-submit:hover{background:#c43a10}
 .btn-submit:active{transform:scale(.98)}
 .btn-submit:disabled{background:#ccc;cursor:not-allowed;transform:none}
 .btn-submit svg{width:18px;height:18px;fill:#fff}
 #status-box{display:none;padding:12px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;margin-top:1rem;border:1px solid;animation:fadeUp .3s ease}
 #status-box.success{background:var(--success-bg);color:var(--success);border-color:#bbf7d0}
 #status-box.error{background:var(--error-bg);color:var(--error);border-color:#fecaca}
-#status-box.info{background:var(--brand-light);color:var(--brand-mid);border-color:#93c5fd}
+#status-box.info{background:#fff0eb;color:#E84E1B;border-color:#93c5fd}
 
 /* SUCCESS */
 #success-screen{display:none;text-align:center;padding:3rem 2rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);animation:fadeUp .4s ease}
@@ -145,7 +145,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .success-icon svg{width:36px;height:36px;fill:var(--success)}
 #success-screen h2{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;margin-bottom:.5rem}
 #success-screen p{color:var(--text-2);font-size:14px;line-height:1.6;max-width:420px;margin:0 auto 1rem}
-.ticket-badge{display:inline-flex;align-items:center;gap:8px;background:var(--brand-light);color:var(--brand-mid);border-radius:20px;padding:8px 18px;font-size:14px;font-weight:600;margin-bottom:1rem}
+.ticket-badge{display:inline-flex;align-items:center;gap:8px;background:#fff0eb;color:#E84E1B;border-radius:20px;padding:8px 18px;font-size:14px;font-weight:600;margin-bottom:1rem}
 .success-details{background:#fafbfc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;text-align:left;margin:1rem auto;max-width:400px}
 .success-details .sd-row{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
 .success-details .sd-row:last-child{border-bottom:none}
@@ -153,8 +153,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .success-details .sd-icon svg{width:14px;height:14px}
 .success-details .sd-label{font-size:11px;color:var(--text-3)}
 .success-details .sd-value{font-size:13px;font-weight:500;color:var(--text);margin-top:1px}
-.btn-new{padding:10px 24px;background:transparent;color:var(--brand-mid);border:1.5px solid var(--brand-mid);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
-.btn-new:hover{background:var(--brand-light)}
+.btn-new{padding:10px 24px;background:transparent;color:var(--brand-mid);border:1.5px solid var(--brand-mid);border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-new:hover{background:#fff0eb}
 .board-link{display:inline-flex;align-items:center;gap:6px;color:var(--text-3);font-size:13px;text-decoration:none;margin-top:.75rem;transition:color .2s}
 .board-link:hover{color:var(--brand-mid)}
 .board-link svg{width:14px;height:14px;fill:currentColor}
@@ -166,9 +166,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .search-card p{font-size:13px;color:var(--text-2);margin-bottom:1rem;line-height:1.5}
 .search-row{display:flex;gap:10px}
 .search-row input{flex:1}
-.btn-search{padding:10px 20px;background:var(--brand-mid);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .2s;display:flex;align-items:center;gap:6px}
+.btn-search{padding:10px 20px;background:#E84E1B;color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .2s;display:flex;align-items:center;gap:6px}
 .btn-search svg{width:16px;height:16px;fill:#fff}
-.btn-search:hover{background:var(--brand)}
+.btn-search:hover{background:#c43a10}
 .btn-search:disabled{background:#ccc;cursor:not-allowed}
 
 /* ticket cards list */
@@ -176,7 +176,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .ticket-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;animation:fadeUp .3s ease;transition:box-shadow .2s}
 .ticket-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.1),0 8px 24px rgba(0,0,0,.07)}
 .tc-header{padding:.9rem 1.25rem;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);cursor:pointer}
-.tc-id{font-size:11px;font-weight:600;color:var(--brand-mid);background:var(--brand-light);padding:3px 9px;border-radius:20px;white-space:nowrap}
+.tc-id{font-size:11px;font-weight:600;color:#E84E1B;background:#fff0eb;padding:3px 9px;border-radius:20px;white-space:nowrap}
 .tc-title{font-size:14px;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tc-chevron{width:16px;height:16px;fill:var(--text-3);flex-shrink:0;transition:transform .25s}
 .ticket-card.open .tc-chevron{transform:rotate(180deg)}
@@ -198,8 +198,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .td-item .td-val{font-size:13px;font-weight:500;color:var(--text)}
 .tc-desc{font-size:13px;color:var(--text-2);line-height:1.6;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:.75rem;white-space:pre-wrap;max-height:160px;overflow-y:auto}
 .tc-actions{display:flex;gap:8px;flex-wrap:wrap}
-.tc-actions a,.tc-actions button{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--radius-sm);text-decoration:none;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:#fff;color:var(--text-2);font-family:'DM Sans',sans-serif}
-.tc-actions a:hover,.tc-actions button:hover{background:var(--brand-light);color:var(--brand-mid);border-color:var(--brand-mid)}
+.tc-actions a,.tc-actions button{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--radius-sm);text-decoration:none;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:#fff;color:var(--text-2);font-family:'Inter',sans-serif}
+.tc-actions a:hover,.tc-actions button:hover{background:#fff0eb;color:#E84E1B;border-color:var(--brand-mid)}
 .tc-actions svg{width:13px;height:13px;fill:currentColor}
 
 /* kanban mini progress */
@@ -225,7 +225,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* MISC */
-footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size:12px;color:rgba(255,255,255,.45)}
+footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px;color:rgba(255,255,255,.9)}
 .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner-dark{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--brand-mid);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
@@ -248,11 +248,18 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
 
 <!-- HEADER -->
 <header>
-  <div class="logo">
-    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-    Central de Atendimento
+  <!-- Logo Strada — setas apontando para a DIREITA -->
+  <div style="display:flex;align-items:center;gap:12px">
+    <svg width="130" height="34" viewBox="0 0 370 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Seta 1 — maior, apontando para direita -->
+      <polygon points="0,85 0,5 32,45" fill="#E84E1B"/>
+      <!-- Seta 2 — menor, apontando para direita, deslocada -->
+      <polygon points="18,85 18,5 50,45" fill="#E84E1B" opacity="0.55"/>
+      <!-- Texto Strada -->
+      <text x="65" y="64" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="52" fill="#ffffff" letter-spacing="-1">Strada</text>
+    </svg>
   </div>
-  <span class="header-badge">Powered by Businessmap</span>
+  <span style="background:rgba(232,78,27,.2);color:#ff7a50;font-size:12px;padding:4px 14px;border-radius:20px;border:1px solid rgba(232,78,27,.35);font-weight:500">Central de Atendimento</span>
 </header>
 
 <!-- HERO -->
@@ -290,7 +297,7 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
 
 <main>
   <!-- ── SETUP BANNER — Azure Function ── -->
-  <div id="setup-banner" style="display:none;background:#1e3a5f;border-bottom:1px solid #2563a8;padding:1rem 1.5rem;gap:12px;flex-direction:column;position:relative;z-index:50">
+  <div id="setup-banner" style="display:none;background:#1a1a1a;border-bottom:1px solid #2563a8;padding:1rem 1.5rem;gap:12px;flex-direction:column;position:relative;z-index:50">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div style="width:32px;height:32px;background:#0078d4;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
         <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -307,7 +314,7 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
     </div>
     <input type="hidden" id="setup-search-url" value=""/>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <button onclick="saveFlowUrls()" style="padding:8px 20px;background:#f6821f;color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Salvar e ativar</button>
+      <button onclick="saveFlowUrls()" style="padding:8px 20px;background:#E84E1B;color:#fff;border:none;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Salvar e ativar</button>
       <a href="https://workers.cloudflare.com" target="_blank" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:underline">Abrir Cloudflare Workers &#8594;</a>
       <span id="setup-saved-msg" style="display:none;color:#4ade80;font-size:12px">&#10003; Salvo!</span>
     </div>
@@ -605,7 +612,7 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
         <p>Acesse a aba <strong>Acompanhar Chamados</strong> e consulte o status com seu e-mail a qualquer momento.</p>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:.5rem">
           <button class="btn-new" onclick="resetForm()">Abrir novo chamado</button>
-          <button class="btn-new" onclick="switchTab('track');document.getElementById('track-email').value=document.getElementById('f-email').value;searchTickets()" style="background:var(--brand-mid);color:#fff;border-color:var(--brand-mid)">Ver meus chamados →</button>
+          <button class="btn-new" onclick="switchTab('track');document.getElementById('track-email').value=document.getElementById('f-email').value;searchTickets()" style="background:#E84E1B;color:#fff;border-color:var(--brand-mid)">Ver meus chamados →</button>
         </div>
         <br/>
         <a class="board-link" href="https://stradaz3.businessmap.io/ctrl_board/95/" target="_blank">
@@ -629,11 +636,11 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
         <!-- Tabs de busca -->
         <div style="display:flex;gap:0;margin-bottom:1rem;border-bottom:2px solid var(--border)">
           <button id="search-tab-email" onclick="switchSearchTab('email')"
-            style="padding:7px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--brand-mid);border-bottom:2px solid var(--brand-mid);margin-bottom:-2px;font-family:'DM Sans',sans-serif">
+            style="padding:7px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--brand-mid);border-bottom:2px solid var(--brand-mid);margin-bottom:-2px;font-family:'Inter',sans-serif">
             👤 Por nome / squad
           </button>
           <button id="search-tab-id" onclick="switchSearchTab('id')"
-            style="padding:7px 16px;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'DM Sans',sans-serif">
+            style="padding:7px 16px;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif">
             🔢 Por ID do ticket
           </button>
         </div>

@@ -1173,7 +1173,7 @@ async function submitTicket() {
   const payload = {
     board_id:    BOARD_ID,
     title:       `[${category}] ${title}` + (ticketRef ? ` — Ref: ${ticketRef}` : ''),
-    description: descFormatted,
+    description: '',
     priority:    priorityMap[priority] || 'Medium',
     tags:        [category, area].filter(Boolean),
     squad:       squad       || undefined,
@@ -1181,24 +1181,10 @@ async function submitTicket() {
     attachments: [],
     video_url:   videoUrl || undefined
   };
-
-  // Converte imagens para base64 e inclui no payload
-  const attachmentDescs = [];
-  if (attachedFiles.length > 0) {
-    setLoading(true, 'Preparando evidências...'); setProgress(30);
-    for (let i = 0; i < attachedFiles.length; i++) {
-      const f = attachedFiles[i];
-      try {
-        const b64 = await fileToBase64(f);
-        payload.attachments.push({ file_name: f.name, data: b64, mime_type: f.type });
-        attachmentDescs.push(`📎 ${f.name}`);
-      } catch(e) { console.warn('Arquivo ignorado:', f.name); }
-      setProgress(30 + Math.round((i+1)/attachedFiles.length * 30));
-    }
-  }
+  // Monta descrição final — lista nomes dos anexos (sem base64)
+  const attachmentDescs = attachedFiles.map(f => `📎 ${f.name}`);
   if (videoUrl) attachmentDescs.push(`🎬 Vídeo: ${videoUrl}`);
 
-  // Monta descrição final com anexos incluídos
   const descFormatted =
     `**Solicitante:** ${name}\n` +
     `**E-mail:** ${email}\n` +
@@ -1210,6 +1196,8 @@ async function submitTicket() {
     `\n---\n\n${desc}`;
 
   payload.description = descFormatted;
+  // Não envia base64 no payload principal — manda sem anexos para ser rápido
+  payload.attachments = [];
 
   let cardId = null;
 
@@ -1228,10 +1216,6 @@ async function submitTicket() {
           || result.data?.id
           || '✓';
 
-    // Mostra resultado dos anexos
-    const attachRes = result.data?.attachments_uploaded || [];
-    const attachOk  = attachRes.filter(a => a.ok).length;
-    const attachFail = attachRes.filter(a => !a.ok).length;
     setProgress(100); setLoading(false); setStep(4);
 
     document.getElementById('ticket-form').style.display = 'none';
@@ -1239,17 +1223,51 @@ async function submitTicket() {
     document.getElementById('ss-email').textContent = email;
     document.getElementById('ss-attachments').textContent =
       attachedFiles.length > 0
-        ? attachedFiles.length + ' arquivo(s)' +
-          (attachOk > 0 ? ' — ' + attachOk + ' anexado(s) ✅' : '') +
-          (attachFail > 0 ? ' — ' + attachFail + ' falhou ⚠️' : '') +
-          (videoUrl ? ' + vídeo' : '')
+        ? attachedFiles.length + ' arquivo(s) — enviando...'
         : (videoUrl ? 'Vídeo externo' : 'Nenhuma');
     document.getElementById('success-screen').style.display = 'block';
     setProgress(0);
 
+    // Envia anexos em background APÓS mostrar sucesso (não trava o formulário)
+    if (cardId && cardId !== '✓' && attachedFiles.length > 0) {
+      uploadAttachmentsBackground(cardId, attachedFiles, videoUrl, flowUrl);
+    }
+
   } catch(err) {
     setLoading(false); setProgress(0); setStep(1);
     showStatus('Erro ao criar chamado: ' + err.message, 'error');
+  }
+}
+
+// Envia anexos em background sem travar a UI
+async function uploadAttachmentsBackground(cardId, files, videoUrl, flowUrl) {
+  let ok = 0, fail = 0;
+  for (const f of files) {
+    try {
+      const b64 = await fileToBase64(f);
+      const res = await callFlow(flowUrl, {
+        card_id:   cardId,
+        file_name: f.name,
+        data:      b64,
+        mime_type: f.type || 'application/octet-stream'
+      }, 'add_attachment');
+      if (res.ok) ok++; else fail++;
+    } catch { fail++; }
+  }
+  // Atualiza status dos anexos na tela de sucesso
+  const el = document.getElementById('ss-attachments');
+  if (el) {
+    el.textContent = files.length + ' arquivo(s)'
+      + (ok   > 0 ? ' — ' + ok   + ' anexado(s) ✅' : '')
+      + (fail > 0 ? ' — ' + fail + ' falhou ⚠️' : '')
+      + (videoUrl ? ' + vídeo' : '');
+  }
+  // Vídeo externo como comentário
+  if (videoUrl) {
+    await callFlow(flowUrl, {
+      card_id: cardId,
+      text: '🎬 **Vídeo de evidência:** ' + videoUrl
+    }, 'add_comment').catch(() => {});
   }
 }
 

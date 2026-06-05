@@ -624,13 +624,13 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
       <!-- BUSCA -->
       <div class="search-card">
         <h2>Consultar chamados</h2>
-        <p>Busque pelo <strong>nome do solicitante</strong> para ver todos os seus tickets, ou pelo <strong>número do ticket</strong> para abrir um chamado específico.</p>
+        <p>Busque pelo <strong>nome do solicitante</strong>, <strong>squad responsável</strong> ou <strong>analista atribuído</strong>, ou pelo <strong>número do ticket</strong>.</p>
 
         <!-- Tabs de busca -->
         <div style="display:flex;gap:0;margin-bottom:1rem;border-bottom:2px solid var(--border)">
           <button id="search-tab-email" onclick="switchSearchTab('email')"
             style="padding:7px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--brand-mid);border-bottom:2px solid var(--brand-mid);margin-bottom:-2px;font-family:'DM Sans',sans-serif">
-            👤 Por nome
+            👤 Por nome / squad
           </button>
           <button id="search-tab-id" onclick="switchSearchTab('id')"
             style="padding:7px 16px;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'DM Sans',sans-serif">
@@ -641,7 +641,7 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
         <!-- Busca por nome -->
         <div id="search-by-email">
           <div class="search-row">
-            <input type="text" id="track-email" placeholder="Ex.: Isabele Pinheiro" onkeydown="if(event.key==='Enter')searchTickets()"/>
+            <input type="text" id="track-email" placeholder="Ex.: Isabele, Squad Foundation, N3..." onkeydown="if(event.key==='Enter')searchTickets()"/>
             <button class="btn-search" id="btn-search" onclick="searchTickets()">
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               Buscar
@@ -860,15 +860,9 @@ async function submitTicket() {
   const urgencyLabel = {hoje:'Preciso hoje',semana:'Esta semana',quinzena:'Quinzena',mes:'Sem urgência'};
   const priorityMap  = {critical:'Critical',high:'High',medium:'Medium',low:'Low'};
 
-  // Descrição limpa — só informações de contato + descrição do problema
-  const descFormatted =
-    `**Solicitante:** ${name}\n` +
-    `**E-mail:** ${email}\n` +
-    `**Área:** ${area||'Não informado'}\n` +
-    `**Contato:** ${phone||'Não informado'}\n` +
-    (ticketRef ? `**Ref. Ticket:** ${ticketRef}\n` : '') +
-    (urgency   ? `**Urgência:** ${urgencyLabel[urgency]}\n` : '') +
-    `\n---\n\n${desc}`;
+  // Descrição — monta após coletar anexos (abaixo)
+  let attachmentLines = '';
+  // Nota: attachmentLines será preenchido após converter arquivos
 
   // Payload enviado ao Worker
   const payload = {
@@ -884,6 +878,7 @@ async function submitTicket() {
   };
 
   // Converte imagens para base64 e inclui no payload
+  const attachmentDescs = [];
   if (attachedFiles.length > 0) {
     setLoading(true, 'Preparando evidências...'); setProgress(30);
     for (let i = 0; i < attachedFiles.length; i++) {
@@ -891,10 +886,25 @@ async function submitTicket() {
       try {
         const b64 = await fileToBase64(f);
         payload.attachments.push({ file_name: f.name, data: b64, mime_type: f.type });
+        attachmentDescs.push(`📎 ${f.name}`);
       } catch(e) { console.warn('Arquivo ignorado:', f.name); }
       setProgress(30 + Math.round((i+1)/attachedFiles.length * 30));
     }
   }
+  if (videoUrl) attachmentDescs.push(`🎬 Vídeo: ${videoUrl}`);
+
+  // Monta descrição final com anexos incluídos
+  const descFormatted =
+    `**Solicitante:** ${name}\n` +
+    `**E-mail:** ${email}\n` +
+    `**Área:** ${area||'Não informado'}\n` +
+    `**Contato:** ${phone||'Não informado'}\n` +
+    (ticketRef ? `**Ref. Ticket:** ${ticketRef}\n` : '') +
+    (urgency   ? `**Urgência:** ${urgencyLabel[urgency]}\n` : '') +
+    (attachmentDescs.length ? `\n**Evidências:**\n${attachmentDescs.join('\n')}\n` : '') +
+    `\n---\n\n${desc}`;
+
+  payload.description = descFormatted;
 
   let cardId = null;
 
@@ -1085,7 +1095,7 @@ async function searchTickets() {
     if (!workerUrl) throw new Error('no-worker');
 
     // Busca via Worker por nome do solicitante
-    const result = await callFlow(workerUrl, { name, board_id: BOARD_ID }, 'search_cards');
+    const result = await callFlow(workerUrl, { query: name, board_id: BOARD_ID }, 'search_cards');
 
     if (!result.ok) throw new Error(result.data?.message || result.data?.error || 'Erro ' + result.status);
 

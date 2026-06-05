@@ -955,59 +955,49 @@ function priorityBadge(p) {
 }
 
 async function searchTickets() {
-  const email   = document.getElementById('track-email').value.trim();
-  const apiKey  = API_KEY;
-  const boardId = String(BOARD_ID);
-  const list    = document.getElementById('tickets-list');
-  const flowUrl = localStorage.getItem('pa_search_url') || '';
+  const email  = document.getElementById('track-email').value.trim();
+  const list   = document.getElementById('tickets-list');
 
   if (!email) { showTrackMsg('Informe seu e-mail para buscar.','error'); return; }
 
   document.getElementById('btn-search').disabled = true;
   list.innerHTML = `<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando chamados...</p></div>`;
-  document.getElementById('track-status').style.display='none';
+  document.getElementById('track-status').style.display = 'none';
+
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
 
   try {
     let cards = [];
 
-    if (flowUrl) {
-      // Via Power Automate (SharePoint)
-      const result = await callFlow(flowUrl, { email, board_id: BOARD_ID, apikey: API_KEY }, 'search_cards');
-      if (!result.ok) throw new Error(result.data?.message || 'Erro ' + result.status);
-      cards = result.data?.cards || result.data?.data?.cards || result.data || [];
-    } else {
-      // Fallback direto (fora do SharePoint, sem CORS)
-      const res = await fetch(`https://stradaz3.businessmap.io/api/v2/cards?board_id=${boardId}&page_size=100`, {
-        headers: { 'apikey': apiKey }
-      });
-      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.message||'Erro '+res.status); }
-      const data = await res.json();
-      const all  = data.data?.cards || data.cards || data.data || [];
-      const emailLower = email.toLowerCase();
-      cards = all.filter(c => ((c.description||'')+(c.title||'')).toLowerCase().includes(emailLower));
-    }
+    if (!workerUrl) throw new Error('no-worker');
+
+    // Busca via Worker — sem CORS
+    const result = await callFlow(workerUrl, { email, board_id: BOARD_ID }, 'search_cards');
+
+    if (!result.ok) throw new Error(result.data?.message || result.data?.error || 'Erro ' + result.status);
+
+    cards = result.data?.cards || result.data?.data?.cards || result.data || [];
 
     document.getElementById('btn-search').disabled = false;
 
-    if (mine.length === 0) {
+    if (!Array.isArray(cards) || cards.length === 0) {
       list.innerHTML = `<div class="state-box">
         <div class="sb-icon" style="background:#f1f5f9"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:#94a3b8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
         <h3>Nenhum chamado encontrado</h3>
-        <p>Não encontramos tickets associados a <strong>${email}</strong> no board #${boardId}.</p>
+        <p>Não encontramos tickets com o e-mail <strong>${email}</strong> no board.</p>
       </div>`;
       return;
     }
 
-    const mine = cards;
-    showTrackMsg(`${mine.length} chamado(s) encontrado(s) para ${email}`,'success');
+    showTrackMsg(`${cards.length} chamado(s) encontrado(s) para ${email}`, 'success');
     list.innerHTML = '';
+    cards.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
 
-    mine.sort((a,b) => new Date(b.created_at||0)-new Date(a.created_at||0));
-
-    mine.forEach((card,idx) => {
-      const col    = card.column_name||card.column||'';
-      const cardId = card.card_id||card.id||'—';
-      const div    = document.createElement('div');
+    cards.forEach((card, idx) => {
+      const col    = card.column_name || card.column || '';
+      const cardId = card.card_id || card.id || '—';
+      const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
+      const div = document.createElement('div');
       div.className = 'ticket-card';
       div.innerHTML = `
         <div class="tc-header" onclick="toggleCard(this.closest('.ticket-card'))">
@@ -1020,35 +1010,36 @@ async function searchTickets() {
           ${kanbanProgress(col)}
           <div class="td-grid">
             <div class="td-item"><div class="td-label">Criado em</div><div class="td-val">${fmtDate(card.created_at)}</div></div>
-            <div class="td-item"><div class="td-label">Atualizado</div><div class="td-val">${fmtDate(card.updated_at)}</div></div>
-            <div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">${priorityBadge(card.priority)}</div></div>
+            <div class="td-item"><div class="td-label">Atualizado</div><div class="td-val">${fmtDate(card.last_modified||card.updated_at)}</div></div>
+            <div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">${priorityLabels[card.priority]||'—'}</div></div>
             <div class="td-item"><div class="td-label">Responsável</div><div class="td-val">${card.owner_user_name||card.owner||'Não atribuído'}</div></div>
           </div>
-          ${card.description?`<div class="tc-desc">${card.description.replace(/</g,'&lt;').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>`:''}
+          ${card.description ? `<div class="tc-desc">${card.description.replace(/</g,'&lt;').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>` : ''}
           <div class="tc-actions">
-            <a href="https://stradaz3.businessmap.io/ctrl_board/95/" target="_blank">
+            <a href="https://stradaz3.businessmap.io/ctrl_board/95/cards/${cardId}/details/" target="_blank">
               <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
               Ver no board
             </a>
-            <button onclick="refreshCard(${cardId},this.closest('.ticket-card'))">
+            <button onclick="refreshCard(${cardId}, this.closest('.ticket-card'))">
               <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
               Atualizar status
             </button>
           </div>
         </div>`;
       list.appendChild(div);
-      // auto-open first card
-      if (idx===0) div.classList.add('open');
+      if (idx === 0) div.classList.add('open');
     });
 
   } catch(err) {
     document.getElementById('btn-search').disabled = false;
-    // DEMO MODE
-    if (err.message.includes('fetch')||err.message.includes('Failed')) {
+    if (err.message === 'no-worker') {
+      showTrackMsg('Configure a URL do Worker primeiro — clique em ⚙ Configurar.', 'error');
+      list.innerHTML = '';
+    } else if (err.message.includes('fetch') || err.message.includes('Failed')) {
       renderDemoTickets(email, list);
     } else {
-      list.innerHTML='';
-      showTrackMsg('Erro ao buscar chamados: '+err.message,'error');
+      list.innerHTML = '';
+      showTrackMsg('Erro ao buscar chamados: ' + err.message, 'error');
     }
   }
 }
@@ -1066,35 +1057,29 @@ function toggleCard(el) {
 }
 
 async function refreshCard(cardId, cardEl) {
-  const apiKey = API_KEY;
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
   const btn = cardEl.querySelector('button');
   const origHtml = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor;animation:spin .7s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Atualizando...';
-
   try {
-    const res  = await fetch(`https://stradaz3.businessmap.io/api/v2/cards/${cardId}`,{headers:{'apikey':apiKey}});
-    const data = await res.json();
-    const card = data.data||data;
-    const col  = card.column_name||card.column||'';
-
-    // update pill
-    const pill = cardEl.querySelector('.tc-header .status-pill');
-    if (pill) pill.outerHTML = statusPill(col);
-
-    // update kanban
-    const kanban = cardEl.querySelector('.kanban-track');
-    if (kanban) kanban.outerHTML = kanbanProgress(col);
-
-    // update updated_at
-    const updEls = cardEl.querySelectorAll('.td-val');
-    if (updEls[1]) updEls[1].textContent = fmtDate(card.updated_at);
-    if (updEls[2]) updEls[2].textContent = priorityBadge(card.priority);
-    if (updEls[3]) updEls[3].textContent = card.owner_user_name||card.owner||'Não atribuído';
-
+    const result = await callFlow(workerUrl, { card_id: cardId }, 'get_card');
+    const card = result.data?.data?.[0] || result.data?.data || result.data;
+    if (card) {
+      const col = card.column_name || card.column || '';
+      const pill = cardEl.querySelector('.tc-header .status-pill');
+      if (pill) pill.outerHTML = statusPill(col);
+      const kanban = cardEl.querySelector('.kanban-track');
+      if (kanban) kanban.outerHTML = kanbanProgress(col);
+      const vals = cardEl.querySelectorAll('.td-val');
+      const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
+      if (vals[1]) vals[1].textContent = fmtDate(card.last_modified||card.updated_at);
+      if (vals[2]) vals[2].textContent = priorityLabels[card.priority] || '—';
+      if (vals[3]) vals[3].textContent = card.owner_user_name || card.owner || 'Não atribuído';
+    }
   } catch(e) { console.warn(e); }
-
-  btn.disabled=false; btn.innerHTML=origHtml;
+  btn.disabled = false;
+  btn.innerHTML = origHtml;
 }
 
 /* demo mode */

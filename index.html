@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1222,7 +1223,16 @@ async function submitTicket() {
       throw new Error(msg);
     }
 
-    cardId = result.data?.card_id || result.data?.data?.card_id || result.data?.id || '✓';
+    cardId = result.data?.card_id
+          || result.data?.data?.[0]?.card_id
+          || result.data?.data?.card_id
+          || result.data?.id
+          || '✓';
+
+    // Mostra resultado dos anexos
+    const attachRes = result.data?.attachments_uploaded || [];
+    const attachOk  = attachRes.filter(a => a.ok).length;
+    const attachFail = attachRes.filter(a => !a.ok).length;
     setProgress(100); setLoading(false); setStep(4);
 
     document.getElementById('ticket-form').style.display = 'none';
@@ -1230,7 +1240,10 @@ async function submitTicket() {
     document.getElementById('ss-email').textContent = email;
     document.getElementById('ss-attachments').textContent =
       attachedFiles.length > 0
-        ? attachedFiles.length + ' arquivo(s)' + (videoUrl ? ' + vídeo' : '')
+        ? attachedFiles.length + ' arquivo(s)' +
+          (attachOk > 0 ? ' — ' + attachOk + ' anexado(s) ✅' : '') +
+          (attachFail > 0 ? ' — ' + attachFail + ' falhou ⚠️' : '') +
+          (videoUrl ? ' + vídeo' : '')
         : (videoUrl ? 'Vídeo externo' : 'Nenhuma');
     document.getElementById('success-screen').style.display = 'block';
     setProgress(0);

@@ -697,7 +697,7 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
           <div class="panel-body">
             <div class="grid-2">
               <div class="field">
-                <label>ID do Ticket de Referência<span class="hint">— se já existe</span></label>
+                <label>ID do Ticket de Referência <span class="req">*</span></label>
                 <input type="text" id="f-ticket-ref" placeholder="Ex.: ATD-1234, INC-5678..."/>
               </div>
               <div class="field">
@@ -1152,11 +1152,12 @@ async function submitTicket() {
   const flowUrl   = localStorage.getItem('pa_create_url') || '';
 
   const missing = [];
-  if (!name)     missing.push('Nome');
-  if (!email)    missing.push('E-mail');
-  if (!title)    missing.push('Título');
-  if (!category) missing.push('Categoria');
-  if (!desc)     missing.push('Descrição');
+  if (!name)      missing.push('Nome');
+  if (!email)     missing.push('E-mail');
+  if (!title)     missing.push('Título');
+  if (!category)  missing.push('Categoria');
+  if (!desc)      missing.push('Descrição');
+  if (!ticketRef) missing.push('ID do Ticket de Referência');
   if (missing.length) { showStatus('Preencha: ' + missing.join(', '), 'error'); return; }
   if (!flowUrl)  { showStatus('Configure a URL do Power Automate no banner acima antes de enviar.', 'error'); document.getElementById('setup-banner').style.display='flex'; return; }
 
@@ -1181,22 +1182,40 @@ async function submitTicket() {
     attachments: [],
     video_url:   videoUrl || undefined
   };
-  // Monta descrição final — lista nomes dos anexos (sem base64)
-  const attachmentDescs = attachedFiles.map(f => `📎 ${f.name}`);
-  if (videoUrl) attachmentDescs.push(`🎬 Vídeo: ${videoUrl}`);
+
+  // Monta descrição em HTML — formato aceito pelo Businessmap
+  const rows = [
+    ['👤 Solicitante', name],
+    ['📧 E-mail',      email],
+    ['🏢 Área',        area || 'Não informado'],
+    ['📞 Contato',     phone || 'Não informado'],
+    ['🏷️ Categoria',   category],
+    ...(squad       ? [['👥 Squad',     squad]]       : []),
+    ...(application ? [['💻 Aplicação', application]] : []),
+    ...(ticketRef   ? [['🔗 Ref. Ticket', ticketRef]] : []),
+    ...(urgency     ? [['⏱️ Urgência',  urgencyLabel[urgency]]] : []),
+  ];
+
+  const tableRows = rows.map(([label, value]) =>
+    `<tr><td style="padding:4px 12px 4px 0;color:#666;white-space:nowrap;vertical-align:top"><b>${label}</b></td><td style="padding:4px 0;color:#222">${value}</td></tr>`
+  ).join('');
+
+  const attachmentNames = attachedFiles.map(f =>
+    `<li>📎 ${f.name} <span style="color:#aaa;font-size:11px">(anexo sendo enviado...)</span></li>`
+  ).join('');
+  const videoLine = videoUrl
+    ? `<li>🎬 <a href="${videoUrl}" target="_blank">Vídeo de evidência</a></li>`
+    : '';
+  const evidencesBlock = (attachedFiles.length || videoUrl)
+    ? `<p><b>📁 Evidências:</b></p><ul>${attachmentNames}${videoLine}</ul>`
+    : '';
 
   const descFormatted =
-    `**Solicitante:** ${name}\n` +
-    `**E-mail:** ${email}\n` +
-    `**Área:** ${area||'Não informado'}\n` +
-    `**Contato:** ${phone||'Não informado'}\n` +
-    (ticketRef ? `**Ref. Ticket:** ${ticketRef}\n` : '') +
-    (urgency   ? `**Urgência:** ${urgencyLabel[urgency]}\n` : '') +
-    (attachmentDescs.length ? `\n**Evidências:**\n${attachmentDescs.join('\n')}\n` : '') +
-    `\n---\n\n${desc}`;
+    `<table>${tableRows}</table>` +
+    evidencesBlock +
+    `<hr><p>${desc.replace(/\n/g, '<br>')}</p>`;
 
   payload.description = descFormatted;
-  // Não envia base64 no payload principal — manda sem anexos para ser rápido
   payload.attachments = [];
 
   let cardId = null;
@@ -1239,9 +1258,11 @@ async function submitTicket() {
   }
 }
 
-// Envia anexos em background sem travar a UI
+// Envia anexos em background e atualiza descrição com links reais
 async function uploadAttachmentsBackground(cardId, files, videoUrl, flowUrl) {
   let ok = 0, fail = 0;
+  const attachLinks = [];
+
   for (const f of files) {
     try {
       const b64 = await fileToBase64(f);
@@ -1251,10 +1272,23 @@ async function uploadAttachmentsBackground(cardId, files, videoUrl, flowUrl) {
         data:      b64,
         mime_type: f.type || 'application/octet-stream'
       }, 'add_attachment');
-      if (res.ok) ok++; else fail++;
-    } catch { fail++; }
+
+      if (res.ok) {
+        ok++;
+        // Tenta pegar URL do arquivo retornada pela API
+        const fileUrl = res.data?.data?.url || res.data?.url || res.data?.link || null;
+        attachLinks.push({ name: f.name, url: fileUrl, ok: true });
+      } else {
+        fail++;
+        attachLinks.push({ name: f.name, url: null, ok: false });
+      }
+    } catch {
+      fail++;
+      attachLinks.push({ name: f.name, url: null, ok: false });
+    }
   }
-  // Atualiza status dos anexos na tela de sucesso
+
+  // Atualiza status na tela de sucesso
   const el = document.getElementById('ss-attachments');
   if (el) {
     el.textContent = files.length + ' arquivo(s)'
@@ -1262,11 +1296,26 @@ async function uploadAttachmentsBackground(cardId, files, videoUrl, flowUrl) {
       + (fail > 0 ? ' — ' + fail + ' falhou ⚠️' : '')
       + (videoUrl ? ' + vídeo' : '');
   }
-  // Vídeo externo como comentário
-  if (videoUrl) {
+
+  // Adiciona comentário com links dos anexos enviados
+  if (ok > 0 || videoUrl) {
+    const lines = attachLinks
+      .filter(a => a.ok)
+      .map(a => a.url
+        ? `<li>📎 <a href="${a.url}" target="_blank">${a.name}</a></li>`
+        : `<li>📎 ${a.name} ✅</li>`
+      ).join('');
+    const failLines = attachLinks
+      .filter(a => !a.ok)
+      .map(a => `<li>⚠️ ${a.name} — falha no upload</li>`)
+      .join('');
+    const videoLine = videoUrl
+      ? `<li>🎬 <a href="${videoUrl}" target="_blank">Vídeo de evidência</a></li>`
+      : '';
+
     await callFlow(flowUrl, {
       card_id: cardId,
-      text: '🎬 **Vídeo de evidência:** ' + videoUrl
+      text: `<b>📁 Evidências enviadas:</b><ul>${lines}${failLines}${videoLine}</ul>`
     }, 'add_comment').catch(() => {});
   }
 }

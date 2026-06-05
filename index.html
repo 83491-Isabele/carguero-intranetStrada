@@ -27,7 +27,7 @@ header{background:var(--brand);padding:0 2.5rem;height:64px;display:flex;align-i
 .header-badge{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.18)}
 
 /* HERO */
-.hero{display:none}
+.hero{background:linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 60%,#3a1a10 100%);padding:1.75rem 2.5rem 1.5rem;text-align:center;color:#fff;margin-left:220px}
 .hero-label{display:inline-block;background:rgba(232,78,27,.25);color:#ff7f5c;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:.6rem;border:1px solid rgba(232,78,27,.4)}
 .hero h1{font-family:'DM Serif Display',serif;font-size:clamp(24px,4vw,36px);font-weight:400;line-height:1.15;margin-bottom:.5rem}
 .hero h1 em{font-style:italic;color:#E84E1B}
@@ -613,6 +613,13 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
   </div>
 </aside>
 
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-label">Squad Foundation · Strada</span>
+  <h1>Central de <em>Atendimento</em></h1>
+  <p>Abra chamados e acompanhe o status em tempo real — tudo integrado ao Businessmap.</p>
+</div>
+
 <!-- STEPS (only form tab) -->
 <div class="steps-bar" id="steps-bar">
   <div class="steps">
@@ -956,53 +963,92 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
     ════════════════════════════════════════ -->
     <div id="tab-track" style="display:none">
 
-      <!-- CONTROLES DO BOARD -->
-      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.25rem;margin-bottom:1rem">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.85rem">
-          <div style="flex:1;min-width:200px">
-            <h2 style="font-size:15px;font-weight:600;margin-bottom:2px">Board Squad Foundation</h2>
-            <p style="font-size:12px;color:var(--text-3)" id="board-subtitle">Visualização dinâmica — Board #95</p>
+      <!-- Sub-abas: Meus Chamados / Board -->
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.25rem;background:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:0 .25rem">
+        <button id="track-sub-list" onclick="switchTrackView('list')"
+          style="padding:.65rem 1.25rem;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Meus Chamados
+        </button>
+        <button id="track-sub-board" onclick="switchTrackView('board')"
+          style="padding:.65rem 1.25rem;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Board Kanban
+        </button>
+      </div>
+
+      <!-- ── VISÃO LISTA ── -->
+      <div id="track-view-list">
+        <div class="search-card">
+          <h2>Consultar chamados</h2>
+          <p>Busque pelo <strong>nome do solicitante</strong>, <strong>squad responsável</strong> ou pelo <strong>número do ticket</strong> para acompanhar em tempo real.</p>
+          <div style="display:flex;gap:0;margin-bottom:1rem;border-bottom:2px solid var(--border)">
+            <button id="search-tab-email" onclick="switchSearchTab('email')"
+              style="padding:7px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif">
+              👤 Por nome / squad
+            </button>
+            <button id="search-tab-id" onclick="switchSearchTab('id')"
+              style="padding:7px 16px;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif">
+              🔢 Por ID do ticket
+            </button>
           </div>
-          <!-- Busca por ID do ticket -->
-          <div style="display:flex;gap:6px;align-items:center">
+          <div id="search-by-email">
+            <div class="search-row">
+              <input type="text" id="track-email" placeholder="Ex.: Isabele, Squad Foundation, N3..." onkeydown="if(event.key==='Enter')searchTickets()"/>
+              <button class="btn-search" id="btn-search" onclick="searchTickets()">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Buscar
+              </button>
+            </div>
+          </div>
+          <div id="search-by-id" style="display:none">
+            <div class="search-row">
+              <input type="text" id="track-ticket-id" placeholder="Ex.: 24042" onkeydown="if(event.key==='Enter')searchByTicketId()"/>
+              <button class="btn-search" id="btn-search-id" onclick="searchByTicketId()">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Buscar
+              </button>
+            </div>
+          </div>
+          <div id="track-status" style="display:none;margin-top:.75rem;font-size:13px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid"></div>
+        </div>
+        <div id="tickets-list"></div>
+      </div>
+
+      <!-- ── VISÃO BOARD ── -->
+      <div id="track-view-board" style="display:none">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.25rem;margin-bottom:1rem">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.85rem">
+            <div style="flex:1;min-width:160px">
+              <h2 style="font-size:14px;font-weight:600;margin-bottom:2px">Board Squad Foundation</h2>
+              <p style="font-size:11px;color:var(--text-3)" id="board-subtitle">Board #95</p>
+            </div>
             <div style="position:relative">
               <svg viewBox="0 0 24 24" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;fill:none;stroke:#aaa;stroke-width:2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" id="board-search" placeholder="Buscar card ou #ID..." oninput="filterBoardCards()"
-                style="padding:7px 10px 7px 28px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:185px"
+              <input type="text" id="board-search" placeholder="Buscar ou digitar #ID..." oninput="filterBoardCards()"
+                style="padding:7px 10px 7px 28px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:190px"
                 onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='var(--border)'"/>
             </div>
-            <button onclick="loadBoard()" title="Atualizar" style="padding:7px 10px;background:#f5f5f5;color:#555;border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Inter',sans-serif">
-              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <button onclick="loadBoard()" style="padding:7px 10px;background:#f5f5f5;color:#555;border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Inter',sans-serif">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
               Atualizar
             </button>
           </div>
+          <div style="display:flex;gap:0;border-bottom:2px solid #f0f0f0">
+            <button onclick="switchWorkflow('290')" id="wf-tab-290" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">📥 Backlog Atendimento</button>
+            <button onclick="switchWorkflow('270')" id="wf-tab-270" style="padding:6px 14px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">🔧 N3</button>
+            <button onclick="switchWorkflow('266')" id="wf-tab-266" style="padding:6px 14px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">📋 Cards workflow</button>
+            <div style="flex:1"></div>
+            <span id="board-card-count" style="font-size:11px;color:#aaa;padding:6px 0;align-self:center"></span>
+          </div>
         </div>
-        <!-- Abas de Workflow -->
-        <div style="display:flex;gap:0;border-bottom:2px solid #f0f0f0">
-          <button onclick="switchWorkflow('290')" id="wf-tab-290"
-            style="padding:6px 14px;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">
-            📥 Backlog Atendimento
-          </button>
-          <button onclick="switchWorkflow('270')" id="wf-tab-270"
-            style="padding:6px 14px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">
-            🔧 N3
-          </button>
-          <button onclick="switchWorkflow('266')" id="wf-tab-266"
-            style="padding:6px 14px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;white-space:nowrap">
-            📋 Cards workflow
-          </button>
-          <div style="flex:1"></div>
-          <span id="board-card-count" style="font-size:11px;color:#aaa;padding:6px 0;align-self:center"></span>
+        <div id="board-container" style="overflow-x:auto;padding-bottom:1rem">
+          <div id="board-loading" style="text-align:center;padding:3rem;color:var(--text-3)">
+            <div class="spinner-dark" style="margin:0 auto 1rem"></div>
+            <p style="font-size:13px">Carregando board...</p>
+          </div>
+          <div id="board-columns" style="display:none;display:flex;gap:10px;min-width:max-content"></div>
         </div>
-      </div>
-
-      <!-- BOARD KANBAN DINÂMICO -->
-      <div id="board-container" style="overflow-x:auto;padding-bottom:1rem">
-        <div id="board-loading" style="text-align:center;padding:3rem;color:var(--text-3)">
-          <div class="spinner-dark" style="margin:0 auto 1rem"></div>
-          <p style="font-size:13px">Carregando board...</p>
-        </div>
-        <div id="board-columns" style="display:none;display:flex;gap:10px;min-width:max-content"></div>
       </div>
 
       <!-- MODAL DETALHES DO CARD + RESPOSTA -->
@@ -1069,12 +1115,31 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
 /* ═══════════════════════════════════════════════════
    TABS
 ═══════════════════════════════════════════════════ */
+function switchTrackView(view) {
+  const isList  = view === 'list';
+  document.getElementById('track-view-list').style.display  = isList  ? 'block' : 'none';
+  document.getElementById('track-view-board').style.display = !isList ? 'block' : 'none';
+
+  const listBtn  = document.getElementById('track-sub-list');
+  const boardBtn = document.getElementById('track-sub-board');
+  if (listBtn) {
+    listBtn.style.color           = isList ? '#E84E1B' : '#888';
+    listBtn.style.borderBottomColor = isList ? '#E84E1B' : 'transparent';
+    listBtn.style.fontWeight      = isList ? '600' : '500';
+  }
+  if (boardBtn) {
+    boardBtn.style.color           = !isList ? '#E84E1B' : '#888';
+    boardBtn.style.borderBottomColor = !isList ? '#E84E1B' : 'transparent';
+    boardBtn.style.fontWeight      = !isList ? '600' : '500';
+  }
+  if (!isList && boardCards.length === 0) loadBoard();
+}
+
 function switchTab(t) {
   document.getElementById('tab-form').style.display  = t==='form'  ? 'block' : 'none';
   document.getElementById('tab-track').style.display = t==='track' ? 'block' : 'none';
   document.getElementById('steps-bar').style.display = t==='form'  ? 'flex'  : 'none';
 
-  // Update sidebar active states
   ['form','track'].forEach(tab => {
     const btn = document.getElementById('tab-btn-' + tab);
     if (!btn) return;
@@ -1088,8 +1153,6 @@ function switchTab(t) {
       btn.style.fontWeight = '500';
     }
   });
-
-  if (t === 'track') loadBoard();
 }
 
 // ═══════════════════════════════════════════════════

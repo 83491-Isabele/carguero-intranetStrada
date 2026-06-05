@@ -697,7 +697,7 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
           <div class="panel-body">
             <div class="grid-2">
               <div class="field">
-                <label>ID do Ticket de Referência<span class="hint">— se já existe</span></label>
+                <label>ID do Ticket de Referência <span class="req">*</span></label>
                 <input type="text" id="f-ticket-ref" placeholder="Ex.: ATD-1234, INC-5678..."/>
               </div>
               <div class="field">
@@ -1152,11 +1152,12 @@ async function submitTicket() {
   const flowUrl   = localStorage.getItem('pa_create_url') || '';
 
   const missing = [];
-  if (!name)     missing.push('Nome');
-  if (!email)    missing.push('E-mail');
-  if (!title)    missing.push('Título');
-  if (!category) missing.push('Categoria');
-  if (!desc)     missing.push('Descrição');
+  if (!name)      missing.push('Nome');
+  if (!email)     missing.push('E-mail');
+  if (!title)     missing.push('Título');
+  if (!category)  missing.push('Categoria');
+  if (!desc)      missing.push('Descrição');
+  if (!ticketRef) missing.push('ID do Ticket de Referência');
   if (missing.length) { showStatus('Preencha: ' + missing.join(', '), 'error'); return; }
   if (!flowUrl)  { showStatus('Configure a URL do Power Automate no banner acima antes de enviar.', 'error'); document.getElementById('setup-banner').style.display='flex'; return; }
 

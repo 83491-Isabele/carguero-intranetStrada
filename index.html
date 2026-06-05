@@ -1183,37 +1183,35 @@ async function submitTicket() {
     video_url:   videoUrl || undefined
   };
 
-  // Monta descrição em HTML — formato aceito pelo Businessmap
-  const rows = [
-    ['👤 Solicitante', name],
-    ['📧 E-mail',      email],
-    ['🏢 Área',        area || 'Não informado'],
-    ['📞 Contato',     phone || 'Não informado'],
-    ['🏷️ Categoria',   category],
-    ...(squad       ? [['👥 Squad',     squad]]       : []),
-    ...(application ? [['💻 Aplicação', application]] : []),
-    ...(ticketRef   ? [['🔗 Ref. Ticket', ticketRef]] : []),
-    ...(urgency     ? [['⏱️ Urgência',  urgencyLabel[urgency]]] : []),
+  // Monta descrição em texto estruturado — Businessmap não renderiza HTML/Markdown
+  const sep = '─'.repeat(40);
+
+  const infoLines = [
+    `👤 Solicitante : ${name}`,
+    `📧 E-mail      : ${email}`,
+    `🏢 Área        : ${area || 'Não informado'}`,
+    `📞 Contato     : ${phone || 'Não informado'}`,
+    `🏷️ Categoria   : ${category}`,
+    ...(squad       ? [`👥 Squad        : ${squad}`]       : []),
+    ...(application ? [`💻 Aplicação    : ${application}`] : []),
+    ...(ticketRef   ? [`🔗 Ref. Ticket  : ${ticketRef}`]   : []),
+    ...(urgency     ? [`⏱️ Urgência     : ${urgencyLabel[urgency]}`] : []),
   ];
 
-  const tableRows = rows.map(([label, value]) =>
-    `<tr><td style="padding:4px 12px 4px 0;color:#666;white-space:nowrap;vertical-align:top"><b>${label}</b></td><td style="padding:4px 0;color:#222">${value}</td></tr>`
-  ).join('');
+  const attachLines = [
+    ...(attachedFiles.map(f => `   📎 ${f.name}`)),
+    ...(videoUrl ? [`   🎬 ${videoUrl}`] : []),
+  ];
 
-  const attachmentNames = attachedFiles.map(f =>
-    `<li>📎 ${f.name} <span style="color:#aaa;font-size:11px">(anexo sendo enviado...)</span></li>`
-  ).join('');
-  const videoLine = videoUrl
-    ? `<li>🎬 <a href="${videoUrl}" target="_blank">Vídeo de evidência</a></li>`
-    : '';
-  const evidencesBlock = (attachedFiles.length || videoUrl)
-    ? `<p><b>📁 Evidências:</b></p><ul>${attachmentNames}${videoLine}</ul>`
-    : '';
-
-  const descFormatted =
-    `<table>${tableRows}</table>` +
-    evidencesBlock +
-    `<hr><p>${desc.replace(/\n/g, '<br>')}</p>`;
+  const descFormatted = [
+    sep,
+    ...infoLines,
+    sep,
+    '',
+    desc,
+    '',
+    ...(attachLines.length ? [sep, '📁 Evidências:', ...attachLines] : []),
+  ].join('\n');
 
   payload.description = descFormatted;
   payload.attachments = [];
@@ -1301,21 +1299,20 @@ async function uploadAttachmentsBackground(cardId, files, videoUrl, flowUrl) {
   if (ok > 0 || videoUrl) {
     const lines = attachLinks
       .filter(a => a.ok)
-      .map(a => a.url
-        ? `<li>📎 <a href="${a.url}" target="_blank">${a.name}</a></li>`
-        : `<li>📎 ${a.name} ✅</li>`
-      ).join('');
+      .map(a => a.url ? `📎 ${a.name} → ${a.url}` : `📎 ${a.name} ✅`)
+      .join('\n');
     const failLines = attachLinks
       .filter(a => !a.ok)
-      .map(a => `<li>⚠️ ${a.name} — falha no upload</li>`)
-      .join('');
-    const videoLine = videoUrl
-      ? `<li>🎬 <a href="${videoUrl}" target="_blank">Vídeo de evidência</a></li>`
-      : '';
+      .map(a => `⚠️ ${a.name} — falha no upload`)
+      .join('\n');
+    const videoLine = videoUrl ? `🎬 Vídeo → ${videoUrl}` : '';
+
+    const commentText = ['📁 Evidências enviadas:', lines, failLines, videoLine]
+      .filter(Boolean).join('\n');
 
     await callFlow(flowUrl, {
       card_id: cardId,
-      text: `<b>📁 Evidências enviadas:</b><ul>${lines}${failLines}${videoLine}</ul>`
+      text: commentText
     }, 'add_comment').catch(() => {});
   }
 }

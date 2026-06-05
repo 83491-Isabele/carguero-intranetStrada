@@ -1502,9 +1502,9 @@ function getUsers() {
   if (stored) return JSON.parse(stored);
   // Usuários padrão iniciais
   const defaults = [
-    { email: 'isabele.aquino@strada.log.br',  name: 'Isabele Aquino',   role: 'admin',      password: btoa('strada@2024') },
-    { email: 'paula.calefi@strada.log.br',    name: 'Paula Calefi',     role: 'admin',      password: btoa('strada@2024') },
-    { email: 'guilherme.cruz@strada.log.br',  name: 'Guilherme Cruz',   role: 'admin',      password: btoa('strada@2024') },
+    { email: 'isabele.aquino@strada.log.br',  name: 'Isabele Aquino',   role: 'admin', password: encode('strada@2024') },
+    { email: 'paula.calefi@strada.log.br',    name: 'Paula Calefi',     role: 'admin', password: encode('strada@2024') },
+    { email: 'guilherme.cruz@strada.log.br',  name: 'Guilherme Cruz',   role: 'admin', password: encode('strada@2024') },
   ];
   localStorage.setItem('strada_users', JSON.stringify(defaults));
   return defaults;
@@ -1521,7 +1521,13 @@ function getCurrentUser() {
 
 function login(email, password) {
   const users = getUsers();
-  const user  = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === btoa(password));
+  const user  = users.find(u => {
+    if (u.email.toLowerCase() !== email.toLowerCase()) return false;
+    // Tenta novo encoding seguro primeiro, depois btoa simples (compatibilidade)
+    try { if (u.password === encode(password)) return true; } catch {}
+    try { if (u.password === btoa(password)) return true; } catch {}
+    return false;
+  });
   if (!user) return false;
   localStorage.setItem('strada_session', JSON.stringify({ email: user.email, name: user.name, role: user.role }));
   return true;
@@ -1646,12 +1652,24 @@ function doChangePassword() {
   const users = getUsers();
   const idx   = users.findIndex(u => u.email === user.email);
 
-  if (idx === -1 || users[idx].password !== btoa(current)) {
+  if (idx === -1) {
+    errEl.textContent = 'Usuário não encontrado.';
+    errEl.style.display = 'block'; return;
+  }
+
+  // Verifica senha atual com ambos os métodos
+  const pwdMatch = (() => {
+    try { if (users[idx].password === encode(current)) return true; } catch {}
+    try { if (users[idx].password === btoa(current)) return true; } catch {}
+    return false;
+  })();
+
+  if (!pwdMatch) {
     errEl.textContent = 'Senha atual incorreta.';
     errEl.style.display = 'block'; return;
   }
 
-  users[idx].password = btoa(newPwd);
+  users[idx].password = encode(newPwd);
   saveUsers(users);
 
   okEl.style.display = 'block';
@@ -1674,22 +1692,29 @@ function closeUserManager() {
   document.getElementById('user-manager-modal').style.display = 'none';
 }
 
+// Encoding seguro para btoa (suporta caracteres especiais)
+function encode(str) { return btoa(unescape(encodeURIComponent(str))); }
+function decode(str) { try { return decodeURIComponent(escape(atob(str))); } catch { return atob(str); } }
+
 function renderUserList() {
   const users = getUsers();
   const list  = document.getElementById('um-list');
   list.innerHTML = '';
   users.forEach((u, i) => {
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0f0f0';
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #f0f0f0;flex-wrap:wrap';
     row.innerHTML = `
-      <div style="flex:1">
+      <div style="flex:1;min-width:180px">
         <div style="font-size:13px;font-weight:600;color:#1a1a1a">${u.name}</div>
         <div style="font-size:12px;color:#999">${u.email}</div>
       </div>
       <span style="background:${u.role==='admin'?'#fff0eb':'#f0f9ff'};color:${u.role==='admin'?'#E84E1B':'#0369a1'};font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid ${u.role==='admin'?'#fcd9c8':'#bae6fd'}">
         ${u.role==='admin'?'Admin':'Atendimento'}
       </span>
-      ${u.email !== SUPER_ADMIN ? `<button onclick="removeUser(${i})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:inherit">Remover</button>` : '<span style="font-size:11px;color:#ccc">Super Admin</span>'}
+      ${u.email !== SUPER_ADMIN ? `
+        <button onclick="resetUserPassword(${i})" style="background:#fff0eb;color:#E84E1B;border:1px solid #fcd9c8;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:inherit">🔑 Resetar senha</button>
+        <button onclick="removeUser(${i})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:inherit">✕ Remover</button>
+      ` : '<span style="font-size:11px;color:#ccc">Super Admin</span>'}
     `;
     list.appendChild(row);
   });
@@ -1708,12 +1733,19 @@ function addUser() {
   const users = getUsers();
   if (users.find(u => u.email === email)) { err.textContent='E-mail já cadastrado.'; err.style.display='block'; return; }
 
-  users.push({ email, name, role, password: btoa(password) });
+  users.push({ email, name, role, password: encode(password) });
   saveUsers(users);
   err.style.display = 'none';
   document.getElementById('um-name').value = '';
   document.getElementById('um-email').value = '';
   document.getElementById('um-password').value = '';
+
+  // Mostra senha criada para o admin copiar
+  const msg = document.getElementById('um-error');
+  msg.style.background = '#dcfce7'; msg.style.color = '#16a34a'; msg.style.borderColor = '#bbf7d0';
+  msg.textContent = `✓ Usuário criado! Senha inicial: ${password}`;
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display='none'; msg.style.background=''; msg.style.color=''; }, 5000);
   renderUserList();
 }
 
@@ -1724,6 +1756,33 @@ function removeUser(idx) {
   saveUsers(users);
   renderUserList();
 }
+
+function resetUserPassword(idx) {
+  const newPwd = prompt('Nova senha para o usuário:');
+  if (!newPwd || newPwd.length < 4) { alert('Senha muito curta (mínimo 4 caracteres).'); return; }
+  const users = getUsers();
+  users[idx].password = encode(newPwd);
+  saveUsers(users);
+  alert(`✓ Senha resetada com sucesso!\nSenha: ${newPwd}\nComunique ao usuário.`);
+}
+
+// Corrige senhas antigas (gravadas com btoa simples) para o novo encoding
+function migratePasswords() {
+  const users = getUsers();
+  let changed = false;
+  users.forEach(u => {
+    try {
+      // Testa se a senha decodifica corretamente com o novo método
+      decode(u.password);
+    } catch {
+      // Se falhar, re-encoda com o método seguro
+      try { u.password = encode(atob(u.password)); changed = true; }
+      catch { /* ignora */ }
+    }
+  });
+  if (changed) saveUsers(users);
+}
+migratePasswords();
 
 // Roda a detecção assim que a página carrega
 document.addEventListener('DOMContentLoaded', () => {

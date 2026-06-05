@@ -623,15 +623,43 @@ footer{background:var(--brand);padding:.85rem 2.5rem;text-align:center;font-size
 
       <!-- BUSCA -->
       <div class="search-card">
-        <h2>Consultar meus chamados</h2>
-        <p>Informe seu e-mail corporativo para ver todos os tickets abertos por você no board de atendimento, com status em tempo real.</p>
-        <div class="search-row">
-          <input type="email" id="track-email" placeholder="seu.email@strada.com.br" onkeydown="if(event.key==='Enter')searchTickets()"/>
-          <button class="btn-search" id="btn-search" onclick="searchTickets()">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Buscar
+        <h2>Consultar chamados</h2>
+        <p>Busque por <strong>e-mail corporativo</strong> para ver todos os seus tickets, ou pelo <strong>número do ticket</strong> para abrir um chamado específico.</p>
+
+        <!-- Tabs de busca -->
+        <div style="display:flex;gap:0;margin-bottom:1rem;border-bottom:2px solid var(--border)">
+          <button id="search-tab-email" onclick="switchSearchTab('email')"
+            style="padding:7px 16px;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--brand-mid);border-bottom:2px solid var(--brand-mid);margin-bottom:-2px;font-family:'DM Sans',sans-serif">
+            📧 Por e-mail
+          </button>
+          <button id="search-tab-id" onclick="switchSearchTab('id')"
+            style="padding:7px 16px;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'DM Sans',sans-serif">
+            🔢 Por ID do ticket
           </button>
         </div>
+
+        <!-- Busca por e-mail -->
+        <div id="search-by-email">
+          <div class="search-row">
+            <input type="email" id="track-email" placeholder="seu.email@strada.com.br" onkeydown="if(event.key==='Enter')searchTickets()"/>
+            <button class="btn-search" id="btn-search" onclick="searchTickets()">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Buscar
+            </button>
+          </div>
+        </div>
+
+        <!-- Busca por ID -->
+        <div id="search-by-id" style="display:none">
+          <div class="search-row">
+            <input type="text" id="track-ticket-id" placeholder="Ex.: 24042" onkeydown="if(event.key==='Enter')searchByTicketId()"/>
+            <button class="btn-search" id="btn-search-id" onclick="searchByTicketId()">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Buscar
+            </button>
+          </div>
+        </div>
+
         <div id="track-status" style="display:none;margin-top:.75rem;font-size:13px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid"></div>
       </div>
 
@@ -950,6 +978,93 @@ function fmtDate(d) {
 function priorityBadge(p) {
   const map = {Critical:'🔴 Crítica',High:'🟠 Alta',Medium:'🟡 Média',Low:'🟢 Baixa'};
   return map[p]||p||'—';
+}
+
+function switchSearchTab(tab) {
+  const isEmail = tab === 'email';
+  document.getElementById('search-by-email').style.display = isEmail ? 'block' : 'none';
+  document.getElementById('search-by-id').style.display    = isEmail ? 'none'  : 'block';
+  const emailBtn = document.getElementById('search-tab-email');
+  const idBtn    = document.getElementById('search-tab-id');
+  emailBtn.style.color = isEmail ? 'var(--brand-mid)' : 'var(--text-3)';
+  emailBtn.style.borderBottomColor = isEmail ? 'var(--brand-mid)' : 'transparent';
+  emailBtn.style.fontWeight = isEmail ? '600' : '500';
+  idBtn.style.color = !isEmail ? 'var(--brand-mid)' : 'var(--text-3)';
+  idBtn.style.borderBottomColor = !isEmail ? 'var(--brand-mid)' : 'transparent';
+  idBtn.style.fontWeight = !isEmail ? '600' : '500';
+  document.getElementById('track-status').style.display = 'none';
+  document.getElementById('tickets-list').innerHTML = '';
+}
+
+async function searchByTicketId() {
+  const ticketId = document.getElementById('track-ticket-id').value.trim().replace(/\D/g,'');
+  const list = document.getElementById('tickets-list');
+
+  if (!ticketId) { showTrackMsg('Informe o número do ticket.', 'error'); return; }
+
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
+  if (!workerUrl) { showTrackMsg('Configure a URL do Worker primeiro — clique em ⚙ Configurar.', 'error'); return; }
+
+  document.getElementById('btn-search-id').disabled = true;
+  list.innerHTML = `<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando ticket #${ticketId}...</p></div>`;
+  document.getElementById('track-status').style.display = 'none';
+
+  try {
+    const result = await callFlow(workerUrl, { card_id: parseInt(ticketId) }, 'get_card');
+
+    if (!result.ok || result.data?.error) {
+      throw new Error(result.data?.error?.message || result.data?.message || 'Ticket não encontrado');
+    }
+
+    const card = result.data?.data || result.data;
+    const cardArr = Array.isArray(card) ? card[0] : card;
+
+    if (!cardArr) throw new Error('Ticket não encontrado');
+
+    document.getElementById('btn-search-id').disabled = false;
+    showTrackMsg(`Ticket #${ticketId} encontrado`, 'success');
+    list.innerHTML = '';
+
+    const col    = cardArr.column_name || cardArr.column || '';
+    const cardId = cardArr.card_id || ticketId;
+    const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
+
+    const div = document.createElement('div');
+    div.className = 'ticket-card open';
+    div.innerHTML = `
+      <div class="tc-header" onclick="toggleCard(this.closest('.ticket-card'))">
+        <span class="tc-id">#${cardId}</span>
+        ${statusPill(col)}
+        <span class="tc-title" title="${(cardArr.title||'').replace(/"/g,'&quot;')}">${cardArr.title||'(sem título)'}</span>
+        <svg class="tc-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="tc-body">
+        ${kanbanProgress(col)}
+        <div class="td-grid">
+          <div class="td-item"><div class="td-label">Criado em</div><div class="td-val">${fmtDate(cardArr.created_at)}</div></div>
+          <div class="td-item"><div class="td-label">Atualizado</div><div class="td-val">${fmtDate(cardArr.last_modified||cardArr.updated_at)}</div></div>
+          <div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">${priorityLabels[cardArr.priority]||'—'}</div></div>
+          <div class="td-item"><div class="td-label">Responsável</div><div class="td-val">${cardArr.owner_user_name||cardArr.owner||'Não atribuído'}</div></div>
+        </div>
+        ${cardArr.description ? `<div class="tc-desc">${cardArr.description.replace(/</g,'&lt;').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>` : ''}
+        <div class="tc-actions">
+          <a href="https://stradaz3.businessmap.io/ctrl_board/95/cards/${cardId}/details/" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+            Abrir no board
+          </a>
+          <button onclick="refreshCard(${cardId}, this.closest('.ticket-card'))">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Atualizar status
+          </button>
+        </div>
+      </div>`;
+    list.appendChild(div);
+
+  } catch(err) {
+    document.getElementById('btn-search-id').disabled = false;
+    list.innerHTML = '';
+    showTrackMsg('Erro: ' + err.message, 'error');
+  }
 }
 
 async function searchTickets() {

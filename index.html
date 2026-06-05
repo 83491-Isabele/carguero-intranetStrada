@@ -832,19 +832,17 @@ async function submitTicket() {
   const urgencyLabel = {hoje:'Preciso hoje',semana:'Esta semana',quinzena:'Quinzena',mes:'Sem urgência'};
   const priorityMap  = {critical:'Critical',high:'High',medium:'Medium',low:'Low'};
 
+  // Descrição limpa — só informações de contato + descrição do problema
   const descFormatted =
-    `📋 **Solicitante:** ${name} (${email})\n` +
-    `🏢 **Área:** ${area||'Não informado'}\n` +
-    `📞 **Contato:** ${phone||'Não informado'}\n` +
-    `🏷️ **Categoria:** ${category}\n` +
-    (squad       ? `👥 **Squad Responsável:** ${squad}\n` : '') +
-    (application ? `💻 **Aplicação:** ${application}\n` : '') +
-    (ticketRef   ? `🔗 **Ref. Ticket:** ${ticketRef}\n` : '') +
-    (urgency     ? `⏱ **Urgência:** ${urgencyLabel[urgency]}\n` : '') +
-    (videoUrl    ? `🎬 **Vídeo:** ${videoUrl}\n` : '') +
+    `**Solicitante:** ${name}\n` +
+    `**E-mail:** ${email}\n` +
+    `**Área:** ${area||'Não informado'}\n` +
+    `**Contato:** ${phone||'Não informado'}\n` +
+    (ticketRef ? `**Ref. Ticket:** ${ticketRef}\n` : '') +
+    (urgency   ? `**Urgência:** ${urgencyLabel[urgency]}\n` : '') +
     `\n---\n\n${desc}`;
 
-  // Payload enviado ao Power Automate — ele repassa ao Businessmap
+  // Payload enviado ao Worker
   const payload = {
     board_id:    BOARD_ID,
     title:       `[${category}] ${title}` + (ticketRef ? ` — Ref: ${ticketRef}` : ''),

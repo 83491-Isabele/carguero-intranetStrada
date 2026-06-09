@@ -62,6 +62,21 @@ main{flex:1;padding:1.5rem 2rem 2rem;display:flex;justify-content:center;margin-
 /* Telas de portal usam a largura total disponível */
 #tab-home,#tab-kb,#tab-services{max-width:1100px;margin:0 auto}
 
+/* SIDEBAR RECOLHIDA */
+body.sidebar-collapsed #sidebar{width:62px}
+body.sidebar-collapsed #sidebar-brand{display:none}
+body.sidebar-collapsed #sidebar nav .nav-label{display:none}
+body.sidebar-collapsed #sidebar nav button{justify-content:center;padding:.65rem 0}
+body.sidebar-collapsed #sidebar nav button span,
+body.sidebar-collapsed #sidebar nav button .btn-text{display:none}
+body.sidebar-collapsed #sidebar .sb-footer-info{display:none}
+body.sidebar-collapsed header,
+body.sidebar-collapsed .hero,
+body.sidebar-collapsed .steps-bar,
+body.sidebar-collapsed main,
+body.sidebar-collapsed footer{margin-left:62px}
+body.sidebar-collapsed #sidebar-toggle-icon{transform:rotate(180deg)}
+
 /* PANELS */
 .panel{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.25rem;animation:fadeUp .35s ease both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -606,83 +621,90 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
 <aside id="sidebar" style="position:fixed;left:0;top:0;bottom:0;width:220px;background:#1a1a1a;z-index:199;display:flex;flex-direction:column;overflow:hidden">
 
   <!-- Logo no sidebar -->
-  <div style="padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0">
-    <svg width="110" height="28" viewBox="0 0 370 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="0,85 0,5 32,45" fill="#E84E1B"/>
-      <polygon points="18,85 18,5 50,45" fill="#E84E1B" opacity="0.55"/>
-      <text x="65" y="64" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="52" fill="#ffffff" letter-spacing="-1">Strada</text>
-    </svg>
-    <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;letter-spacing:.05em;text-transform:uppercase">Central de Atendimento</div>
+  <div style="padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px">
+    <div id="sidebar-brand">
+      <svg width="110" height="28" viewBox="0 0 370 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="0,85 0,5 32,45" fill="#E84E1B"/>
+        <polygon points="18,85 18,5 50,45" fill="#E84E1B" opacity="0.55"/>
+        <text x="65" y="64" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="52" fill="#ffffff" letter-spacing="-1">Strada</text>
+      </svg>
+      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;letter-spacing:.05em;text-transform:uppercase">Central de Atendimento</div>
+    </div>
+    <button id="sidebar-toggle" onclick="toggleSidebar()" title="Recolher menu" style="background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.6);border-radius:6px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg id="sidebar-toggle-icon" viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
   </div>
 
   <!-- Navegação principal -->
   <nav style="padding:.75rem .75rem;flex:1;overflow-y:auto">
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;padding:.25rem .5rem;margin-bottom:.35rem">Menu</div>
+    <div class="nav-label" style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;padding:.25rem .5rem;margin-bottom:.35rem">Menu</div>
 
     <button id="tab-btn-home" onclick="switchTab('home')"
       style="width:100%;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border:none;border-radius:8px;background:rgba(232,78,27,.15);color:#ff7a50;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;margin-bottom:3px;transition:all .2s">
       <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Início
+      <span class="btn-text">Início</span>
     </button>
 
     <button id="tab-btn-form" onclick="switchTab('form')"
       style="width:100%;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.55);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;margin-bottom:3px;transition:all .2s"
       onmouseover="if(this.style.background==='transparent'||!this.style.background)this.style.background='rgba(255,255,255,.06)'" onmouseout="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='transparent'">
       <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Abrir Chamado
+      <span class="btn-text">Abrir Chamado</span>
     </button>
 
     <button id="tab-btn-track" onclick="switchTab('track')"
       style="width:100%;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.55);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;margin-bottom:3px;transition:all .2s"
       onmouseover="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='rgba(255,255,255,.06)'" onmouseout="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='transparent'">
       <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Meus Atendimentos
+      <span class="btn-text">Meus Atendimentos</span>
     </button>
 
     <button id="tab-btn-kb" onclick="switchTab('kb')"
       style="width:100%;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.55);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;margin-bottom:3px;transition:all .2s"
       onmouseover="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='rgba(255,255,255,.06)'" onmouseout="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='transparent'">
       <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      Base de Conhecimento
+      <span class="btn-text">Base de Conhecimento</span>
     </button>
 
     <button id="tab-btn-services" onclick="switchTab('services')"
       style="width:100%;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.55);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;margin-bottom:3px;transition:all .2s"
       onmouseover="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='rgba(255,255,255,.06)'" onmouseout="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='transparent'">
       <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-      Serviços Foundation
+      <span class="btn-text">Serviços Foundation</span>
     </button>
 
     <div style="height:1px;background:rgba(255,255,255,.06);margin:.5rem 0"></div>
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;padding:.25rem .5rem;margin-bottom:.35rem">Configuração</div>
+    <div class="nav-label" style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;padding:.25rem .5rem;margin-bottom:.35rem">Configuração</div>
 
     <button id="tab-btn-config" onclick="openConfig()"
       style="width:100%;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.4);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;margin-bottom:3px;transition:all .2s;display:none"
       onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
       <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Integração API
+      <span class="btn-text">Integração API</span>
     </button>
 
     <button id="btn-user-manager" onclick="openUserManager()"
       style="width:100%;display:none;align-items:center;gap:10px;padding:.65rem .75rem;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.4);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;margin-bottom:3px;transition:all .2s"
       onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
       <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Usuários
+      <span class="btn-text">Usuários</span>
     </button>
   </nav>
 
   <!-- Footer do sidebar: usuário logado -->
   <div style="padding:.85rem 1rem;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:.6rem">
-      <div style="width:28px;height:28px;background:#E84E1B;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#fff" id="user-avatar">?</div>
-      <div style="flex:1;overflow:hidden">
-        <div id="user-name-badge" style="font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
-        <div id="user-badge" style="font-size:10px;color:rgba(255,255,255,.4)">Atendimento</div>
+    <div class="sb-footer-info">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.6rem">
+        <div style="width:28px;height:28px;background:#E84E1B;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#fff" id="user-avatar">?</div>
+        <div style="flex:1;overflow:hidden">
+          <div id="user-name-badge" style="font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+          <div id="user-badge" style="font-size:10px;color:rgba(255,255,255,.4)">Atendimento</div>
+        </div>
       </div>
-    </div>
-    <div style="display:flex;gap:5px">
-      <button onclick="openChangePassword()" style="flex:1;padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit">🔒 Senha</button>
-      <button onclick="logout()" style="flex:1;padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit">Sair</button>
+      <div style="display:flex;gap:5px">
+        <button onclick="openChangePassword()" style="flex:1;padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit">🔒 Senha</button>
+        <button onclick="logout()" style="flex:1;padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit">Sair</button>
+      </div>
     </div>
   </div>
 </aside>
@@ -1062,12 +1084,13 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
         </div>
         <div id="search-by-id" style="display:none">
           <div class="search-row">
-            <input type="text" id="track-ticket-id" placeholder="Ex.: 24042" onkeydown="if(event.key==='Enter')searchByTicketId()"/>
+            <input type="text" id="track-ticket-id" placeholder="Ex.: 24576, 24577 (separe por vírgula)" onkeydown="if(event.key==='Enter')searchByTicketId()"/>
             <button class="btn-search" id="btn-search-id" onclick="searchByTicketId()">
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               Buscar
             </button>
           </div>
+          <p style="font-size:11px;color:var(--text-3);margin-top:6px">💡 Você pode buscar vários chamados de uma vez separando os números por vírgula.</p>
         </div>
         <div id="track-status" style="display:none;margin-top:.75rem;font-size:13px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid"></div>
       </div>
@@ -1380,6 +1403,22 @@ function switchTrackView(view) {
   if (!isList && boardCards.length === 0) loadBoard();
 }
 
+function toggleSidebar() {
+  const collapsed = document.body.classList.toggle('sidebar-collapsed');
+  try { localStorage.setItem('strada_sidebar_collapsed', collapsed ? '1' : '0'); } catch {}
+  const btn = document.getElementById('sidebar-toggle');
+  if (btn) btn.title = collapsed ? 'Expandir menu' : 'Recolher menu';
+}
+
+// Restaura estado do menu ao carregar
+(function restoreSidebar(){
+  try {
+    if (localStorage.getItem('strada_sidebar_collapsed') === '1') {
+      document.body.classList.add('sidebar-collapsed');
+    }
+  } catch {}
+})();
+
 function switchTab(t) {
   const tabs = ['home','form','track','kb','services'];
   tabs.forEach(tab => {
@@ -1630,14 +1669,88 @@ function getServiceRequests() {
   catch { return []; }
 }
 
-async function requestService(type) {
-  const descriptions = {
-    'Ambiente': 'Solicitação de provisionamento de ambiente',
-    'Acesso':   'Solicitação de acesso/permissão',
-    'Setup':    'Solicitação de setup/configuração'
-  };
-  const detail = prompt(`Descreva sua solicitação de ${type}:`, descriptions[type] || '');
-  if (!detail) return;
+// Abre o formulário detalhado de solicitação
+function requestService(type) {
+  const icons = { 'Ambiente':'🖥️', 'Acesso':'🔐', 'Setup':'🔧' };
+  let modal = document.getElementById('svc-form-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'svc-form-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem;overflow-y:auto';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;width:100%;max-width:540px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;margin:auto">
+      <div style="background:#1a1a1a;padding:1.1rem 1.5rem;display:flex;align-items:center;justify-content:space-between">
+        <h3 style="color:#fff;font-size:15px;font-weight:600">${icons[type]||''} Solicitar ${type}</h3>
+        <button onclick="closeServiceForm()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+      </div>
+      <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1rem;max-height:65vh;overflow-y:auto">
+        <input type="hidden" id="svcf-type" value="${type}"/>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Descrição detalhada <span style="color:#dc2626">*</span></label>
+          <textarea id="svcf-detail" rows="3" placeholder="Descreva o que você precisa..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;resize:vertical;line-height:1.5;box-sizing:border-box" onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Urgência</label>
+            <select id="svcf-priority" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;background:#fff;cursor:pointer">
+              <option value="Low">🟢 Baixa</option>
+              <option value="Medium" selected>🟡 Média</option>
+              <option value="High">🟠 Alta</option>
+              <option value="Critical">🔴 Crítica</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Ambiente</label>
+            <select id="svcf-env" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;background:#fff;cursor:pointer">
+              <option value="">—</option>
+              <option>Desenvolvimento</option>
+              <option>Homologação</option>
+              <option>Produção</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Prazo desejado</label>
+            <input type="date" id="svcf-deadline" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Sistema / Aplicação</label>
+            <input type="text" id="svcf-system" placeholder="Ex.: Strada Pay" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Justificativa / Motivo</label>
+          <textarea id="svcf-reason" rows="2" placeholder="Por que precisa deste serviço?" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;resize:vertical;line-height:1.5;box-sizing:border-box" onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        </div>
+      </div>
+      <div style="padding:1rem 1.5rem;border-top:1px solid var(--border);background:#fafafa;display:flex;gap:8px">
+        <button onclick="closeServiceForm()" style="flex:1;padding:11px;background:#fff;color:#555;border:1.5px solid #e8e8e8;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer">Cancelar</button>
+        <button onclick="submitServiceRequest()" id="svcf-submit" style="flex:2;padding:11px;background:#E84E1B;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">Enviar solicitação</button>
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+}
+
+function closeServiceForm() {
+  const modal = document.getElementById('svc-form-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+const PRIORITY_PT = { 'Low':'🟢 Baixa', 'Medium':'🟡 Média', 'High':'🟠 Alta', 'Critical':'🔴 Crítica' };
+
+async function submitServiceRequest() {
+  const type     = document.getElementById('svcf-type').value;
+  const detail   = document.getElementById('svcf-detail').value.trim();
+  const priority = document.getElementById('svcf-priority').value;
+  const env      = document.getElementById('svcf-env').value;
+  const deadline = document.getElementById('svcf-deadline').value;
+  const system   = document.getElementById('svcf-system').value.trim();
+  const reason   = document.getElementById('svcf-reason').value.trim();
+
+  if (!detail) { alert('Preencha a descrição detalhada.'); return; }
 
   const user = getCurrentUser();
   const workerUrl = localStorage.getItem('pa_create_url') || '';
@@ -1646,7 +1759,7 @@ async function requestService(type) {
   const requests = getServiceRequests();
   const reqId = 'SVC-' + Date.now().toString().slice(-6);
   const request = {
-    id: reqId, type, detail,
+    id: reqId, type, detail, priority, env, deadline, system, reason,
     requester: user?.name || 'Usuário',
     email: user?.email || '',
     status: 'Solicitado',
@@ -1655,21 +1768,39 @@ async function requestService(type) {
   requests.unshift(request);
   localStorage.setItem(SERVICES_STORAGE, JSON.stringify(requests));
 
+  closeServiceForm();
+
   let cardId = null;
 
-  // Abre chamado no board se configurado
   if (workerUrl) {
     showServiceResult(type, reqId, null, 'loading');
-    const desc = `<table style="border-collapse:collapse">
-      <tr><td style="padding:3px 14px 3px 0"><strong>🔧 Tipo de Serviço</strong></td><td>${type}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0"><strong>👤 Solicitante</strong></td><td>${user?.name||'—'}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0"><strong>📧 E-mail</strong></td><td>${user?.email||'—'}</td></tr>
-    </table><hr><p>${detail.replace(/</g,'&lt;')}</p>`;
+
+    // Monta descrição rica
+    const rows = [
+      ['🔧 Tipo de Serviço', type],
+      ['👤 Solicitante',     user?.name || '—'],
+      ['📧 E-mail',          user?.email || '—'],
+      ['⏱️ Urgência',        PRIORITY_PT[priority] || priority],
+      ...(env      ? [['🖥️ Ambiente',  env]]      : []),
+      ...(deadline ? [['📅 Prazo',     fmtDateOnly(deadline)]] : []),
+      ...(system   ? [['💻 Sistema',   system]]   : []),
+    ];
+    const tableRows = rows.map(([l,v]) =>
+      `<tr><td style="padding:3px 14px 3px 0;white-space:nowrap"><strong>${l}</strong></td><td style="padding:3px 0">${v}</td></tr>`
+    ).join('');
+    const reasonBlock = reason
+      ? `<hr><p><strong>📝 Justificativa:</strong></p><p>${reason.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p>`
+      : '';
+    const desc =
+      `<table style="border-collapse:collapse">${tableRows}</table>` +
+      `<hr><p>${detail.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p>` +
+      reasonBlock;
+
     try {
       const res = await callFlow(workerUrl, {
         title: `[Serviço Foundation] ${type} — ${user?.name||''}`,
         description: desc,
-        priority: 'Medium',
+        priority: priority,
         category: 'Serviço Foundation'
       }, 'create_card');
       if (res.ok) {
@@ -1683,6 +1814,13 @@ async function requestService(type) {
   }
 
   renderServicesStatus();
+}
+
+// Formata data YYYY-MM-DD para DD/MM/YYYY
+function fmtDateOnly(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
 }
 
 // ── Modal de resultado da solicitação ──
@@ -2632,33 +2770,61 @@ function switchSearchTab(tab) {
 }
 
 async function searchByTicketId() {
-  const ticketId = document.getElementById('track-ticket-id').value.trim().replace(/\D/g,'');
+  const raw = document.getElementById('track-ticket-id').value.trim();
   const list = document.getElementById('tickets-list');
-  if (!ticketId) { showTrackMsg('Informe o número do ticket.', 'error'); return; }
+
+  // Extrai todos os números (separados por vírgula, espaço, ponto-e-vírgula)
+  const ids = (raw.match(/\d+/g) || []);
+  if (ids.length === 0) { showTrackMsg('Informe um ou mais números de ticket (ex: 24576, 24577).', 'error'); return; }
+
   const workerUrl = localStorage.getItem('pa_create_url') || '';
   if (!workerUrl) { showTrackMsg('Configure a URL do Worker primeiro.', 'error'); return; }
+
   document.getElementById('btn-search-id').disabled = true;
-  list.innerHTML = '<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando ticket #'+ticketId+'...</p></div>';
+  list.innerHTML = '<div class="state-box"><div class="spinner-dark"></div><p style="margin-top:1rem;font-size:13px;color:var(--text-2)">Buscando ' + ids.length + ' ticket(s)...</p></div>';
   document.getElementById('track-status').style.display = 'none';
-  try {
-    const result = await callFlow(workerUrl, { card_id: parseInt(ticketId) }, 'get_card');
-    if (!result.ok || result.data?.error) throw new Error(result.data?.error?.message || 'Ticket não encontrado');
-    const raw = result.data?.data;
-    const c = Array.isArray(raw) ? raw[0] : raw;
-    if (!c) throw new Error('Ticket não encontrado');
-    document.getElementById('btn-search-id').disabled = false;
-    showTrackMsg('Ticket #' + ticketId + ' encontrado', 'success');
+
+  // Busca todos em paralelo
+  const results = await Promise.all(ids.map(async (id) => {
+    try {
+      const r = await callFlow(workerUrl, { card_id: parseInt(id) }, 'get_card');
+      if (!r.ok || r.data?.error) return { id, card: null };
+      const data = r.data?.data;
+      const c = Array.isArray(data) ? data[0] : data;
+      return { id, card: c || null };
+    } catch { return { id, card: null }; }
+  }));
+
+  document.getElementById('btn-search-id').disabled = false;
+
+  const found    = results.filter(r => r.card);
+  const notFound = results.filter(r => !r.card).map(r => r.id);
+
+  if (found.length === 0) {
     list.innerHTML = '';
-    const el = buildTicketCard(c);
-    el.classList.add('open');
-    el.dataset.commentsLoaded = '1';
-    list.appendChild(el);
-    loadCardCommentsInline(c.card_id || c.id || ticketId);
-  } catch(err) {
-    document.getElementById('btn-search-id').disabled = false;
-    list.innerHTML = '';
-    showTrackMsg('Erro: ' + err.message, 'error');
+    showTrackMsg('Nenhum dos tickets foi encontrado: ' + ids.join(', '), 'error');
+    return;
   }
+
+  // Mensagem de status
+  let msg = found.length + ' ticket(s) encontrado(s)';
+  if (notFound.length) msg += ' · não encontrado(s): ' + notFound.join(', ');
+  showTrackMsg(msg, notFound.length ? 'info' : 'success');
+
+  // Renderiza todos os cards encontrados
+  list.innerHTML = '';
+  found.forEach((r, idx) => {
+    const el = buildTicketCard(r.card);
+    // Abre o primeiro automaticamente; demais ficam recolhidos
+    if (found.length === 1 || idx === 0) {
+      el.classList.add('open');
+      el.dataset.commentsLoaded = '1';
+    }
+    list.appendChild(el);
+    if (found.length === 1 || idx === 0) {
+      loadCardCommentsInline(r.card.card_id || r.card.id || r.id);
+    }
+  });
 }
 
 async function searchTickets() {

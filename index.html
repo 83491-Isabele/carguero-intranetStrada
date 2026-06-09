@@ -55,8 +55,12 @@ header{background:var(--brand);padding:0 2.5rem;height:64px;display:flex;align-i
 .step.done .step-label{color:var(--success)}
 
 /* MAIN */
-main{flex:1;padding:1.5rem 1.5rem 2rem;display:flex;justify-content:center;margin-left:220px}
-.form-wrapper{width:100%;max-width:700px}
+main{flex:1;padding:1.5rem 2rem 2rem;display:flex;justify-content:center;margin-left:220px}
+.form-wrapper{width:100%;max-width:1100px;margin:0 auto}
+/* Telas de formulário/consulta ficam mais estreitas e centralizadas */
+#tab-form,#tab-track{max-width:720px;margin:0 auto}
+/* Telas de portal usam a largura total disponível */
+#tab-home,#tab-kb,#tab-services{max-width:1100px;margin:0 auto}
 
 /* PANELS */
 .panel{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.25rem;animation:fadeUp .35s ease both}
@@ -271,7 +275,17 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
 .progress-bar-wrap{background:rgba(255,255,255,.2);border-radius:4px;height:4px;margin-top:8px;overflow:hidden;display:none}
 .progress-bar{height:100%;background:#fff;border-radius:4px;width:0%;transition:width .3s ease}
 
+/* Tablet — reduz padding lateral */
+@media(max-width:1000px){
+  main{padding:1.25rem 1.25rem 2rem}
+}
+/* Mobile — colapsa sidebar e alinha conteúdo */
 @media(max-width:600px){
+  #sidebar{width:60px}
+  #sidebar nav button span,#sidebar nav button{font-size:0}
+  #sidebar nav button svg{margin:0 auto}
+  header,.hero,.steps-bar,main,footer{margin-left:60px}
+  main{padding:1rem .85rem 1.5rem}
   header{padding:0 1rem}
   .hero{padding:1.5rem 1rem 0}
   .priority-grid{grid-template-columns:repeat(2,1fr)}
@@ -280,6 +294,7 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
   .td-grid{grid-template-columns:1fr}
   .search-row{flex-direction:column}
   .kanban-track .kt-label{display:none}
+  #tab-home > div{grid-template-columns:1fr !important}
 }
 </style>
 </head>
@@ -585,7 +600,7 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
 </div>
 
 <!-- APP WRAPPER -->
-<div id="app-wrapper" style="display:none">
+<div id="app-wrapper" style="display:none;min-height:100vh;flex-direction:column">
 
 <!-- SIDEBAR ESQUERDA -->
 <aside id="sidebar" style="position:fixed;left:0;top:0;bottom:0;width:220px;background:#1a1a1a;z-index:199;display:flex;flex-direction:column;overflow:hidden">
@@ -1282,6 +1297,8 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
   </div><!-- /form-wrapper -->
 </main>
 
+<footer>Central de Atendimento · Strada &nbsp;·&nbsp; Squad Foundation</footer>
+
 </div><!-- /app-wrapper -->
 
 <!-- MODAL: VER ARTIGO KB -->
@@ -1337,8 +1354,6 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
     </div>
   </div>
 </div>
-
-<footer>Central de Atendimento · Strada &nbsp;·&nbsp; Board #95 — Backlog Demanda Atendimento</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
@@ -1615,7 +1630,7 @@ function getServiceRequests() {
   catch { return []; }
 }
 
-function requestService(type) {
+async function requestService(type) {
   const descriptions = {
     'Ambiente': 'Solicitação de provisionamento de ambiente',
     'Acesso':   'Solicitação de acesso/permissão',
@@ -1640,28 +1655,93 @@ function requestService(type) {
   requests.unshift(request);
   localStorage.setItem(SERVICES_STORAGE, JSON.stringify(requests));
 
+  let cardId = null;
+
   // Abre chamado no board se configurado
   if (workerUrl) {
+    showServiceResult(type, reqId, null, 'loading');
     const desc = `<table style="border-collapse:collapse">
       <tr><td style="padding:3px 14px 3px 0"><strong>🔧 Tipo de Serviço</strong></td><td>${type}</td></tr>
       <tr><td style="padding:3px 14px 3px 0"><strong>👤 Solicitante</strong></td><td>${user?.name||'—'}</td></tr>
       <tr><td style="padding:3px 14px 3px 0"><strong>📧 E-mail</strong></td><td>${user?.email||'—'}</td></tr>
     </table><hr><p>${detail.replace(/</g,'&lt;')}</p>`;
-    callFlow(workerUrl, {
-      title: `[Serviço Foundation] ${type} — ${user?.name||''}`,
-      description: desc,
-      priority: 'Medium',
-      category: 'Serviço Foundation'
-    }, 'create_card').then(res => {
+    try {
+      const res = await callFlow(workerUrl, {
+        title: `[Serviço Foundation] ${type} — ${user?.name||''}`,
+        description: desc,
+        priority: 'Medium',
+        category: 'Serviço Foundation'
+      }, 'create_card');
       if (res.ok) {
-        const cardId = res.data?.card_id || res.data?.data?.[0]?.card_id;
+        cardId = res.data?.card_id || res.data?.data?.[0]?.card_id || res.data?.data?.card_id;
         if (cardId) { request.cardId = cardId; localStorage.setItem(SERVICES_STORAGE, JSON.stringify(requests)); }
       }
-    }).catch(()=>{});
+    } catch(e) { /* segue mesmo com erro */ }
+    showServiceResult(type, reqId, cardId, cardId ? 'success' : 'error');
+  } else {
+    showServiceResult(type, reqId, null, 'local');
   }
 
   renderServicesStatus();
-  alert(`✓ Solicitação de ${type} registrada! (${reqId})`);
+}
+
+// ── Modal de resultado da solicitação ──
+function showServiceResult(type, reqId, cardId, state) {
+  let modal = document.getElementById('svc-result-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'svc-result-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1.5rem';
+    document.body.appendChild(modal);
+  }
+
+  let inner = '';
+  if (state === 'loading') {
+    inner = `<div style="text-align:center;padding:1rem 0">
+      <div class="spinner-dark" style="margin:0 auto 1rem"></div>
+      <p style="font-size:14px;color:#555">Registrando solicitação de <strong>${type}</strong> no board...</p>
+    </div>`;
+  } else {
+    const ok = state === 'success';
+    const icon = ok
+      ? '<div style="width:56px;height:56px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:#16a34a;stroke-width:2.5"><polyline points="20 6 9 17 4 12"/></svg></div>'
+      : state === 'local'
+        ? '<div style="width:56px;height:56px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:none;stroke:#3b82f6;stroke-width:2.5"><polyline points="20 6 9 17 4 12"/></svg></div>'
+        : '<div style="width:56px;height:56px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:none;stroke:#f59e0b;stroke-width:2.5"><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div>';
+
+    const cardBlock = cardId
+      ? `<div style="background:#fff0eb;border:1px solid #fcd9c8;border-radius:10px;padding:.85rem 1rem;margin:1rem 0;text-align:center">
+           <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Card criado no board</div>
+           <div style="font-size:22px;font-weight:800;color:#E84E1B">#${cardId}</div>
+         </div>`
+      : (state === 'error'
+          ? `<p style="font-size:12px;color:#b45309;background:#fffbeb;border-radius:8px;padding:.6rem .85rem;margin:1rem 0;text-align:center">Pedido registrado localmente (${reqId}), mas não foi possível criar o card no board. Verifique a integração.</p>`
+          : `<p style="font-size:12px;color:#3b82f6;background:#eff6ff;border-radius:8px;padding:.6rem .85rem;margin:1rem 0;text-align:center">Pedido registrado localmente: <strong>${reqId}</strong></p>`);
+
+    inner = `
+      ${icon}
+      <h3 style="font-size:17px;font-weight:700;text-align:center;margin-bottom:4px">Solicitação enviada!</h3>
+      <p style="font-size:13px;color:#888;text-align:center">Serviço de <strong>${type}</strong> registrado com sucesso.</p>
+      ${cardBlock}
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:1.25rem">
+        ${cardId ? `<button onclick="closeServiceResult();goToCard(${cardId})" style="padding:11px;background:#E84E1B;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Consultar este chamado
+        </button>` : ''}
+        <button onclick="closeServiceResult();switchTab('services')" style="padding:11px;background:${cardId?'#fff':'#E84E1B'};color:${cardId?'#555':'#fff'};border:${cardId?'1.5px solid var(--border)':'none'};border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Abrir novo serviço
+        </button>
+        <button onclick="closeServiceResult()" style="padding:9px;background:none;color:#999;border:none;border-radius:9px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif">Fechar</button>
+      </div>`;
+  }
+
+  modal.innerHTML = `<div style="background:#fff;border-radius:16px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:1.75rem 1.5rem">${inner}</div>`;
+}
+
+function closeServiceResult() {
+  const modal = document.getElementById('svc-result-modal');
+  if (modal) modal.remove();
 }
 
 let svcCardsCache = [];
@@ -3082,7 +3162,7 @@ function applyPermissions(user) {
   if (!user) {
     showLoginScreen();
   } else {
-    document.getElementById('app-wrapper').style.display = 'block';
+    document.getElementById('app-wrapper').style.display = 'flex';
     document.getElementById('login-screen').style.display = 'none';
     // Apply permissions after DOM ready
     if (document.readyState === 'loading') {
@@ -3120,7 +3200,7 @@ function doLogin() {
 
   if (login(email, password)) {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-wrapper').style.display = 'block';
+    document.getElementById('app-wrapper').style.display = 'flex';
     applyPermissions(getCurrentUser());
     switchTab('home');
   } else {

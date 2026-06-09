@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -198,10 +197,49 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .td-item .td-label{font-size:11px;color:var(--text-3);margin-bottom:2px}
 .td-item .td-val{font-size:13px;font-weight:500;color:var(--text)}
 .tc-desc{font-size:13px;color:var(--text-2);line-height:1.6;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:.75rem;white-space:pre-wrap;max-height:160px;overflow-y:auto}
+/* descrição renderizada como HTML do Businessmap */
+.tc-desc-html{white-space:normal}
+.tc-desc-html table{border-collapse:collapse;width:100%;margin:0}
+.tc-desc-html td{padding:3px 14px 3px 0;vertical-align:top}
+.tc-desc-html hr{border:none;border-top:1px solid var(--border);margin:.6rem 0}
+.tc-desc-html p{margin:.4rem 0}
+.tc-desc-html ul{margin:.3rem 0;padding-left:1.2rem}
+.tc-desc-html strong{color:var(--text)}
 .tc-actions{display:flex;gap:8px;flex-wrap:wrap}
 .tc-actions a,.tc-actions button{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--radius-sm);text-decoration:none;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:#fff;color:var(--text-2);font-family:'Inter',sans-serif}
 .tc-actions a:hover,.tc-actions button:hover{background:#fff0eb;color:#E84E1B;border-color:var(--brand-mid)}
 .tc-actions svg{width:13px;height:13px;fill:currentColor}
+
+/* ── CHAT DE COMENTÁRIOS ── */
+.tc-chat{background:#fafafa;border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem;margin-bottom:.75rem}
+.tc-chat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.tc-notes-toggle{font-size:11px;font-weight:600;color:#888;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:6px}
+.tc-notes-toggle:hover{background:#eee;color:#E84E1B}
+.tc-comments{display:flex;flex-direction:column;gap:7px;max-height:240px;overflow-y:auto;margin-bottom:.7rem}
+.tc-comment-loading,.tc-comment-empty{font-size:12px;color:#aaa;text-align:center;padding:.85rem}
+.tc-comment{background:#fff;border:1px solid #eee;border-radius:8px;padding:.55rem .7rem}
+.tc-comment.internal{background:#fffbeb;border-color:#fde68a}
+.tc-comment-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.tc-comment-author{font-size:11px;font-weight:700;color:#E84E1B}
+.tc-comment.internal .tc-comment-author{color:#b45309}
+.tc-comment-date{font-size:10px;color:#aaa}
+.tc-comment-text{font-size:12.5px;color:#333;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.tc-comment-acts{display:flex;gap:8px;margin-top:5px}
+.tc-comment-acts button{font-size:10px;font-weight:600;background:none;border:none;cursor:pointer;color:#888;padding:1px 4px;border-radius:4px}
+.tc-comment-acts button:hover{color:#E84E1B}
+.tc-comment-acts button.del:hover{color:#dc2626}
+.tc-reply{border-top:1px solid var(--border);padding-top:.7rem}
+.tc-reply-tabs{display:flex;gap:5px;margin-bottom:6px}
+.tc-rtab{font-size:11px;font-weight:600;padding:4px 10px;border-radius:14px;border:1px solid var(--border);background:#fff;color:#888;cursor:pointer;font-family:'Inter',sans-serif}
+.tc-rtab.active{background:#E84E1B;color:#fff;border-color:#E84E1B}
+.tc-reply-input{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;resize:vertical;line-height:1.5;box-sizing:border-box}
+.tc-reply-input:focus{border-color:#E84E1B}
+.tc-reply-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:6px}
+.tc-btn-cancel{font-size:12px;font-weight:500;padding:6px 14px;border-radius:7px;border:1.5px solid var(--border);background:#fff;color:#666;cursor:pointer;font-family:'Inter',sans-serif}
+.tc-btn-cancel:hover{background:#f5f5f5}
+.tc-btn-send{font-size:12px;font-weight:600;padding:6px 16px;border-radius:7px;border:none;background:#E84E1B;color:#fff;cursor:pointer;font-family:'Inter',sans-serif}
+.tc-btn-send:hover{background:#c43a10}
+.tc-btn-send:disabled{opacity:.6;cursor:not-allowed}
 
 /* kanban mini progress */
 .kanban-track{display:flex;align-items:center;gap:0;margin-bottom:1rem}
@@ -1221,9 +1259,15 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
       </div>
 
       <!-- Status de pedidos -->
-      <h3 style="font-size:14px;font-weight:700;margin:1.75rem 0 .85rem">Status dos meus pedidos</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:1.75rem 0 .85rem">
+        <h3 style="font-size:14px;font-weight:700">Status dos pedidos de serviço</h3>
+        <button onclick="renderServicesStatus()" style="padding:6px 12px;background:#f5f5f5;border:1px solid var(--border);border-radius:8px;font-size:12px;color:#555;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Atualizar
+        </button>
+      </div>
       <div id="services-status" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden">
-        <div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Nenhum pedido de serviço registrado ainda.</div>
+        <div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Carregando pedidos...</div>
       </div>
     </div><!-- /tab-services -->
 
@@ -1612,7 +1656,64 @@ function requestService(type) {
   alert(`✓ Solicitação de ${type} registrada! (${reqId})`);
 }
 
-function renderServicesStatus() {
+async function renderServicesStatus() {
+  const container = document.getElementById('services-status');
+  if (!container) return;
+
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
+
+  // Sem integração: cai para os registros locais
+  if (!workerUrl) {
+    renderServicesLocal();
+    return;
+  }
+
+  container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px"><div class="spinner-dark" style="margin:0 auto .75rem"></div>Buscando pedidos no board...</div>';
+
+  try {
+    const result = await callFlow(workerUrl, { board_id: BOARD_ID }, 'search_cards');
+    const allCards = result.data?.cards || [];
+
+    // Filtra cards de Serviço Foundation pelo título
+    const svcCards = allCards.filter(c =>
+      (c.title || '').toLowerCase().includes('[serviço foundation]') ||
+      (c.title || '').toLowerCase().includes('[servico foundation]')
+    );
+
+    // Ordena por mais recentes
+    svcCards.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+
+    if (svcCards.length === 0) {
+      container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Nenhum pedido de serviço encontrado no board.</div>';
+      return;
+    }
+
+    const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
+    container.innerHTML = `<div style="display:flex;flex-direction:column">${svcCards.map((c,i) => {
+      const col   = c.column_name || c.column || 'Backlog';
+      const wfId  = String(c.workflow_id || detectWorkflow(col));
+      const cardId = c.card_id || c.id;
+      // Extrai o tipo de serviço do título "[Serviço Foundation] Ambiente — Nome"
+      const titleMatch = (c.title || '').match(/\]\s*([^—\-]+)/);
+      const svcType = titleMatch ? titleMatch[1].trim() : 'Serviço';
+      return `<div onclick="goToCard(${cardId})" style="display:flex;align-items:center;gap:12px;padding:.85rem 1.1rem;cursor:pointer;${i>0?'border-top:1px solid var(--border)':''}" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+        <span style="font-size:11px;font-weight:700;color:#E84E1B;background:#fff0eb;padding:3px 9px;border-radius:8px;flex-shrink:0">#${cardId}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600">${svcType}</div>
+          <div style="font-size:12px;color:var(--text-3)">${priorityLabels[c.priority]||''} · ${c.owner_user_name||'Não atribuído'}</div>
+        </div>
+        ${statusPill(col, wfId)}
+      </div>`;
+    }).join('')}</div>
+    <div style="padding:.6rem 1.1rem;border-top:1px solid var(--border);background:#fafafa;font-size:11px;color:#aaa;text-align:right">${svcCards.length} pedido(s) · clique para abrir</div>`;
+
+  } catch(e) {
+    container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Erro ao buscar pedidos. <button onclick="renderServicesStatus()" style="color:#E84E1B;background:none;border:none;cursor:pointer;font-weight:600">Tentar novamente</button></div>';
+  }
+}
+
+// Fallback: registros locais (sem integração)
+function renderServicesLocal() {
   const requests = getServiceRequests();
   const container = document.getElementById('services-status');
   if (!container) return;
@@ -2438,7 +2539,9 @@ async function searchByTicketId() {
     list.innerHTML = '';
     const el = buildTicketCard(c);
     el.classList.add('open');
+    el.dataset.commentsLoaded = '1';
     list.appendChild(el);
+    loadCardCommentsInline(c.card_id || c.id || ticketId);
   } catch(err) {
     document.getElementById('btn-search-id').disabled = false;
     list.innerHTML = '';
@@ -2470,14 +2573,32 @@ async function searchTickets() {
     cards.sort(function(a,b){ return new Date(b.created_at||0) - new Date(a.created_at||0); });
     cards.forEach(function(card, idx) {
       const el = buildTicketCard(card);
-      if (idx === 0) el.classList.add('open');
+      if (idx === 0) {
+        el.classList.add('open');
+        el.dataset.commentsLoaded = '1';
+      }
       list.appendChild(el);
+      if (idx === 0) loadCardCommentsInline(card.card_id || card.id);
     });
   } catch(err) {
     document.getElementById('btn-search').disabled = false;
     list.innerHTML = '';
     showTrackMsg('Erro ao buscar chamados: ' + err.message, 'error');
   }
+}
+
+// Sanitiza HTML do Businessmap mantendo formatação básica e segura
+function sanitizeCardHtml(html) {
+  if (!html) return '';
+  // Remove scripts/styles e atributos perigosos, mantém tags de formatação
+  let clean = html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/ on\w+="[^"]*"/gi, '')
+    .replace(/ on\w+='[^']*'/gi, '')
+    .replace(/<figure[^>]*>/gi, '')
+    .replace(/<\/figure>/gi, '');
+  return clean;
 }
 
 function buildTicketCard(card) {
@@ -2487,9 +2608,10 @@ function buildTicketCard(card) {
   const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
   const div = document.createElement('div');
   div.className = 'ticket-card';
-  const desc = card.description || '';
-  const descHtml = desc.replace(/</g,'&lt;').replace(/\n/g,'<br>');
-  const descShort = desc.length > 400 ? descHtml.substring(0,400) + '…' : descHtml;
+  div.dataset.cardId = cardId;
+
+  const descClean = sanitizeCardHtml(card.description || '');
+
   div.innerHTML =
     '<div class="tc-header" onclick="toggleCard(this.closest(\'.ticket-card\'))">'
     + '<span class="tc-id">#'+cardId+'</span>'
@@ -2505,12 +2627,165 @@ function buildTicketCard(card) {
     + '<div class="td-item"><div class="td-label">Prioridade</div><div class="td-val">'+(priorityLabels[card.priority]||'—')+'</div></div>'
     + '<div class="td-item"><div class="td-label">Responsável</div><div class="td-val">'+(card.owner_user_name||card.owner||'Não atribuído')+'</div></div>'
     + '</div>'
-    + (desc ? '<div class="tc-desc">'+descShort+'</div>' : '')
+    + (descClean ? '<div class="td-label" style="margin-bottom:5px">Descrição</div><div class="tc-desc tc-desc-html">'+descClean+'</div>' : '')
+    // ── CHAT DE COMENTÁRIOS ──
+    + '<div class="tc-chat">'
+    +   '<div class="tc-chat-head">'
+    +     '<span class="td-label" style="margin:0">💬 Conversas</span>'
+    +     '<button class="tc-notes-toggle" onclick="toggleInternalNotes(this, '+cardId+')">Ver todas</button>'
+    +   '</div>'
+    +   '<div class="tc-comments" id="comments-'+cardId+'"><div class="tc-comment-loading">Carregando conversas...</div></div>'
+    +   '<div class="tc-reply">'
+    +     '<div class="tc-reply-tabs">'
+    +       '<button class="tc-rtab active" data-type="public" onclick="setReplyType(this,\'public\')">📨 Resposta</button>'
+    +       '<button class="tc-rtab" data-type="internal" onclick="setReplyType(this,\'internal\')">🔒 Nota interna</button>'
+    +     '</div>'
+    +     '<textarea class="tc-reply-input" id="reply-'+cardId+'" placeholder="Escreva uma resposta para o card..." rows="2"></textarea>'
+    +     '<div class="tc-reply-actions">'
+    +       '<button class="tc-btn-cancel" onclick="clearReply('+cardId+')">Cancelar</button>'
+    +       '<button class="tc-btn-send" onclick="sendCardReply('+cardId+', this)">Enviar ao card</button>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
     + '<div class="tc-actions">'
     + '<a href="https://stradaz3.businessmap.io/ctrl_board/95/cards/'+cardId+'/details/" target="_blank"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>Ver no board</a>'
     + '<button onclick="refreshCard('+cardId+', this.closest(\'.ticket-card\'))"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Atualizar status</button>'
     + '</div></div>';
   return div;
+}
+
+// ── Tipo de resposta (público / nota interna) ──
+const replyTypes = {};
+function setReplyType(btn, type) {
+  const tabs = btn.parentElement.querySelectorAll('.tc-rtab');
+  tabs.forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const card = btn.closest('.ticket-card');
+  const cardId = card.dataset.cardId;
+  replyTypes[cardId] = type;
+  const input = document.getElementById('reply-' + cardId);
+  if (input) input.placeholder = type === 'internal'
+    ? 'Nota interna (visível só para a equipe)...'
+    : 'Escreva uma resposta para o card...';
+}
+
+function clearReply(cardId) {
+  const input = document.getElementById('reply-' + cardId);
+  if (input) input.value = '';
+}
+
+// ── Carrega comentários do card ──
+async function loadCardCommentsInline(cardId) {
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
+  const container = document.getElementById('comments-' + cardId);
+  if (!container) return;
+
+  try {
+    const res = await callFlow(workerUrl, { card_id: cardId }, 'get_comments');
+    const raw = res.data?.data || res.data?.comments || res.data || [];
+    const comments = Array.isArray(raw) ? raw : [];
+
+    if (comments.length === 0) {
+      container.innerHTML = '<div class="tc-comment-empty">Nenhuma conversa ainda. Seja o primeiro a responder.</div>';
+      return;
+    }
+
+    const user = getCurrentUser();
+    container.innerHTML = comments.map(c => {
+      const text = (c.text || c.comment || '').replace(/<[^>]*>/g, '');
+      const author = c.author?.full_name || c.author_name || c.created_by || 'Usuário';
+      const date = fmtDate(c.created_at || c.date);
+      const cmtId = c.comment_id || c.id;
+      const isInternal = text.startsWith('🔒');
+      const isMine = user && author.toLowerCase().includes((user.name||'').toLowerCase().split(' ')[0]);
+      return `<div class="tc-comment ${isInternal?'internal':''}" data-cmt-id="${cmtId}">
+        <div class="tc-comment-head">
+          <span class="tc-comment-author">${isInternal?'🔒 ':''}${author}</span>
+          <span class="tc-comment-date">${date}</span>
+        </div>
+        <div class="tc-comment-text">${text}</div>
+        ${(isMine && cmtId) ? `<div class="tc-comment-acts">
+          <button onclick="editComment(${cardId},${cmtId},this)">Editar</button>
+          <button onclick="deleteComment(${cardId},${cmtId},this)" class="del">Excluir</button>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+    container.scrollTop = container.scrollHeight;
+  } catch {
+    container.innerHTML = '<div class="tc-comment-empty">Não foi possível carregar as conversas.</div>';
+  }
+}
+
+// ── Envia resposta ao card ──
+async function sendCardReply(cardId, btn) {
+  const input = document.getElementById('reply-' + cardId);
+  const text = input.value.trim();
+  if (!text) return;
+
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
+  const user = getCurrentUser();
+  const author = user ? user.name : 'Usuário';
+  const type = replyTypes[cardId] || 'public';
+  const prefix = type === 'internal' ? '🔒 [NOTA INTERNA] ' : '';
+  const commentText = `${prefix}[${author}] ${text}`;
+
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.textContent = 'Enviando...';
+
+  try {
+    const res = await callFlow(workerUrl, { card_id: cardId, text: commentText }, 'add_comment');
+    if (res.ok) {
+      input.value = '';
+      await loadCardCommentsInline(cardId);
+    } else {
+      alert('Erro ao enviar resposta.');
+    }
+  } catch(e) {
+    alert('Erro: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = orig;
+}
+
+// ── Editar comentário ──
+async function editComment(cardId, cmtId, btn) {
+  const commentEl = btn.closest('.tc-comment');
+  const textEl = commentEl.querySelector('.tc-comment-text');
+  const current = textEl.textContent.replace(/^🔒\s*\[NOTA INTERNA\]\s*/, '').replace(/^\[.*?\]\s*/, '');
+  const novo = prompt('Editar comentário:', current);
+  if (novo === null || novo.trim() === '') return;
+
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
+  const user = getCurrentUser();
+  const author = user ? user.name : 'Usuário';
+
+  try {
+    const res = await callFlow(workerUrl, { card_id: cardId, comment_id: cmtId, text: `[${author}] ${novo.trim()}` }, 'edit_comment');
+    if (res.ok) await loadCardCommentsInline(cardId);
+    else alert('Erro ao editar.');
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+// ── Excluir comentário ──
+async function deleteComment(cardId, cmtId, btn) {
+  if (!confirm('Excluir este comentário?')) return;
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
+  try {
+    const res = await callFlow(workerUrl, { card_id: cardId, comment_id: cmtId }, 'delete_comment');
+    if (res.ok) await loadCardCommentsInline(cardId);
+    else alert('Erro ao excluir.');
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+// ── Mostrar/ocultar notas internas ──
+function toggleInternalNotes(btn, cardId) {
+  const container = document.getElementById('comments-' + cardId);
+  const showingAll = btn.textContent === 'Ver todas';
+  container.querySelectorAll('.tc-comment.internal').forEach(el => {
+    el.style.display = showingAll ? 'block' : 'none';
+  });
+  btn.textContent = showingAll ? 'Ocultar internas' : 'Ver todas';
 }
 
 
@@ -2524,6 +2799,12 @@ function showTrackMsg(msg,type){
 
 function toggleCard(el) {
   el.classList.toggle('open');
+  // Ao abrir, carrega os comentários (uma vez)
+  if (el.classList.contains('open') && !el.dataset.commentsLoaded) {
+    el.dataset.commentsLoaded = '1';
+    const cardId = el.dataset.cardId;
+    if (cardId) loadCardCommentsInline(cardId);
+  }
 }
 
 async function refreshCard(cardId, cardEl) {

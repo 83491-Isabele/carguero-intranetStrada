@@ -1259,12 +1259,20 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
       </div>
 
       <!-- Status de pedidos -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin:1.75rem 0 .85rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:1.75rem 0 .85rem;gap:10px;flex-wrap:wrap">
         <h3 style="font-size:14px;font-weight:700">Status dos pedidos de serviço</h3>
-        <button onclick="renderServicesStatus()" style="padding:6px 12px;background:#f5f5f5;border:1px solid var(--border);border-radius:8px;font-size:12px;color:#555;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px">
-          <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          Atualizar
-        </button>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div style="position:relative">
+            <svg viewBox="0 0 24 24" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;fill:none;stroke:#aaa;stroke-width:2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="svc-search" placeholder="Buscar por #ID ou tipo..." oninput="filterServices()"
+              style="padding:7px 10px 7px 28px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:190px"
+              onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <button onclick="renderServicesStatus()" title="Atualizar" style="padding:7px 11px;background:#f5f5f5;border:1px solid var(--border);border-radius:8px;font-size:12px;color:#555;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Atualizar
+          </button>
+        </div>
       </div>
       <div id="services-status" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden">
         <div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Carregando pedidos...</div>
@@ -1656,6 +1664,8 @@ function requestService(type) {
   alert(`✓ Solicitação de ${type} registrada! (${reqId})`);
 }
 
+let svcCardsCache = [];
+
 async function renderServicesStatus() {
   const container = document.getElementById('services-status');
   if (!container) return;
@@ -1675,41 +1685,63 @@ async function renderServicesStatus() {
     const allCards = result.data?.cards || [];
 
     // Filtra cards de Serviço Foundation pelo título
-    const svcCards = allCards.filter(c =>
+    svcCardsCache = allCards.filter(c =>
       (c.title || '').toLowerCase().includes('[serviço foundation]') ||
       (c.title || '').toLowerCase().includes('[servico foundation]')
     );
 
     // Ordena por mais recentes
-    svcCards.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+    svcCardsCache.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
 
-    if (svcCards.length === 0) {
-      container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Nenhum pedido de serviço encontrado no board.</div>';
-      return;
-    }
-
-    const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
-    container.innerHTML = `<div style="display:flex;flex-direction:column">${svcCards.map((c,i) => {
-      const col   = c.column_name || c.column || 'Backlog';
-      const wfId  = String(c.workflow_id || detectWorkflow(col));
-      const cardId = c.card_id || c.id;
-      // Extrai o tipo de serviço do título "[Serviço Foundation] Ambiente — Nome"
-      const titleMatch = (c.title || '').match(/\]\s*([^—\-]+)/);
-      const svcType = titleMatch ? titleMatch[1].trim() : 'Serviço';
-      return `<div onclick="goToCard(${cardId})" style="display:flex;align-items:center;gap:12px;padding:.85rem 1.1rem;cursor:pointer;${i>0?'border-top:1px solid var(--border)':''}" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
-        <span style="font-size:11px;font-weight:700;color:#E84E1B;background:#fff0eb;padding:3px 9px;border-radius:8px;flex-shrink:0">#${cardId}</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:600">${svcType}</div>
-          <div style="font-size:12px;color:var(--text-3)">${priorityLabels[c.priority]||''} · ${c.owner_user_name||'Não atribuído'}</div>
-        </div>
-        ${statusPill(col, wfId)}
-      </div>`;
-    }).join('')}</div>
-    <div style="padding:.6rem 1.1rem;border-top:1px solid var(--border);background:#fafafa;font-size:11px;color:#aaa;text-align:right">${svcCards.length} pedido(s) · clique para abrir</div>`;
-
+    drawServiceCards();
   } catch(e) {
     container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Erro ao buscar pedidos. <button onclick="renderServicesStatus()" style="color:#E84E1B;background:none;border:none;cursor:pointer;font-weight:600">Tentar novamente</button></div>';
   }
+}
+
+function filterServices() {
+  drawServiceCards();
+}
+
+function drawServiceCards() {
+  const container = document.getElementById('services-status');
+  if (!container) return;
+
+  const search = (document.getElementById('svc-search')?.value || '').toLowerCase().trim();
+  const priorityLabels = {1:'🔴 Crítica', 2:'🟠 Alta', 3:'🟡 Média', 4:'🟢 Baixa'};
+
+  const filtered = svcCardsCache.filter(c => {
+    if (!search) return true;
+    const cardId = String(c.card_id || c.id || '');
+    const title  = (c.title || '').toLowerCase();
+    return cardId.includes(search.replace('#','')) || title.includes(search);
+  });
+
+  if (svcCardsCache.length === 0) {
+    container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Nenhum pedido de serviço encontrado no board.</div>';
+    return;
+  }
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Nenhum pedido corresponde a "<strong>' + search + '</strong>".</div>';
+    return;
+  }
+
+  container.innerHTML = `<div style="display:flex;flex-direction:column">${filtered.map((c,i) => {
+    const col   = c.column_name || c.column || 'Backlog';
+    const wfId  = String(c.workflow_id || detectWorkflow(col));
+    const cardId = c.card_id || c.id;
+    const titleMatch = (c.title || '').match(/\]\s*([^—\-]+)/);
+    const svcType = titleMatch ? titleMatch[1].trim() : 'Serviço';
+    return `<div onclick="goToCard(${cardId})" style="display:flex;align-items:center;gap:12px;padding:.85rem 1.1rem;cursor:pointer;${i>0?'border-top:1px solid var(--border)':''}" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+      <span style="font-size:11px;font-weight:700;color:#E84E1B;background:#fff0eb;padding:3px 9px;border-radius:8px;flex-shrink:0">#${cardId}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${svcType}</div>
+        <div style="font-size:12px;color:var(--text-3)">${priorityLabels[c.priority]||''} · ${c.owner_user_name||'Não atribuído'}</div>
+      </div>
+      ${statusPill(col, wfId)}
+    </div>`;
+  }).join('')}</div>
+  <div style="padding:.6rem 1.1rem;border-top:1px solid var(--border);background:#fafafa;font-size:11px;color:#aaa;text-align:right">${filtered.length} de ${svcCardsCache.length} pedido(s) · clique para abrir</div>`;
 }
 
 // Fallback: registros locais (sem integração)

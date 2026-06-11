@@ -798,22 +798,51 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
             </div>
             <div class="grid-2">
               <div class="field">
-                <label>Área / Time</label>
+                <label>Área <span class="req">*</span></label>
                 <select id="f-area">
                   <option value="">Selecione sua área...</option>
-                  <optgroup label="Atendimento">
-                    <option>Atendimento</option><option>Pré Venda</option><option>Comercial</option>
-                  </optgroup>
-                  <optgroup label="Outras áreas">
-                    <option>Segurança da Informação</option><option>Engenharia</option><option>Produto</option>
-                    <option>Dados</option><option>Financeiro</option><option>Jurídico</option>
-                    <option>RH</option><option>Operações</option><option>Outro</option>
-                  </optgroup>
+                  <option>Atendimento</option>
+                  <option>Pré Venda</option>
+                  <option>Financeiro</option>
+                  <option>Comercial</option>
+                  <option>Logística</option>
+                  <option>Produto</option>
+                  <option>TI / Infraestrutura</option>
+                  <option>RH</option>
                 </select>
               </div>
               <div class="field">
+                <label>Tipo de demanda <span class="req">*</span></label>
+                <select id="f-tipo" onchange="onTipoChange()">
+                  <option value="">Selecione o tipo...</option>
+                  <optgroup label="📋 Chamado">
+                    <option>Incidente / Bug</option>
+                    <option>Dúvida / Suporte</option>
+                    <option>Melhoria / Evolução</option>
+                    <option>Documentação</option>
+                    <option>Treinamento</option>
+                  </optgroup>
+                  <optgroup label="🔧 Serviço">
+                    <option>Solicitação de Serviço</option>
+                  </optgroup>
+                </select>
+              </div>
+            </div>
+            <p id="tipo-hint" style="display:none;font-size:12px;color:#E84E1B;background:#fff0eb;border-radius:7px;padding:7px 11px;margin-top:-.25rem"></p>
+            <div class="grid-2">
+              <div class="field">
                 <label>Ramal / WhatsApp</label>
                 <input type="tel" id="f-phone" placeholder="(11) 9xxxx-xxxx"/>
+              </div>
+              <div class="field">
+                <label>Tipo de entrada <span class="req">*</span></label>
+                <select id="f-entrada">
+                  <option value="">Como chegou a demanda...</option>
+                  <option>WhatsApp</option>
+                  <option>E-mail</option>
+                  <option>Atendimento telefônico</option>
+                  <option>Acionamento direto</option>
+                </select>
               </div>
             </div>
             <div class="email-info-box">
@@ -1093,6 +1122,22 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
           <p style="font-size:11px;color:var(--text-3);margin-top:6px">💡 Você pode buscar vários chamados de uma vez separando os números por vírgula.</p>
         </div>
         <div id="track-status" style="display:none;margin-top:.75rem;font-size:13px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid"></div>
+      </div>
+
+      <!-- FILTROS (modelo Zendesk) -->
+      <div id="track-filters" style="display:none;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.85rem 1.1rem;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em">Filtrar:</span>
+          <select id="filter-type" onchange="applyTicketFilters()" style="padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;outline:none;background:#fff">
+            <option value="">Todos os tipos</option>
+            <option value="chamado">📋 Chamados</option>
+            <option value="servico">🔧 Serviços</option>
+          </select>
+          <select id="filter-area" onchange="applyTicketFilters()" style="padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;outline:none;background:#fff">
+            <option value="">Todas as áreas</option>
+          </select>
+          <span id="filter-count" style="font-size:12px;color:#aaa;margin-left:auto"></span>
+        </div>
       </div>
 
       <!-- RESULTADOS -->
@@ -1448,6 +1493,47 @@ function switchTab(t) {
   if (t === 'home')     loadDashboard();
   if (t === 'kb')       initKb();
   if (t === 'services') renderServicesStatus();
+  if (t === 'track')    initTrackFilters();
+}
+
+// ── Filtros do modelo Zendesk na consulta ──
+function initTrackFilters() {
+  const areaSel = document.getElementById('filter-area');
+  if (areaSel && areaSel.options.length <= 1) {
+    AREAS.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a; opt.textContent = a;
+      areaSel.appendChild(opt);
+    });
+  }
+}
+
+function applyTicketFilters() {
+  const typeF = document.getElementById('filter-type')?.value || '';
+  const areaF = (document.getElementById('filter-area')?.value || '').toLowerCase();
+  const cards = document.querySelectorAll('#tickets-list .ticket-card');
+  let visible = 0;
+
+  cards.forEach(card => {
+    const title = (card.querySelector('.tc-title')?.textContent || '').toLowerCase();
+    let show = true;
+
+    if (typeF === 'chamado' && !title.includes('[chamado]')) show = false;
+    if (typeF === 'servico' && !title.includes('[serviço]') && !title.includes('[servico]')) show = false;
+    if (areaF && !title.includes('[' + areaF + ']')) show = false;
+
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  const countEl = document.getElementById('filter-count');
+  if (countEl) countEl.textContent = visible + ' de ' + cards.length + ' chamado(s)';
+}
+
+// Mostra a barra de filtros quando há resultados
+function showTrackFilters(show) {
+  const f = document.getElementById('track-filters');
+  if (f) f.style.display = show ? 'block' : 'none';
 }
 
 // ═══════════════════════════════════════════════════
@@ -2452,6 +2538,8 @@ async function submitTicket() {
   const category  = document.getElementById('f-category').value;
   const desc      = document.getElementById('f-desc').value.trim();
   const area      = document.getElementById('f-area').value;
+  const tipo      = document.getElementById('f-tipo').value;
+  const entrada   = document.getElementById('f-entrada').value;
   const phone     = document.getElementById('f-phone').value.trim();
   const squad     = document.getElementById('f-squad').value;
   const application = document.getElementById('f-application').value;
@@ -2465,6 +2553,9 @@ async function submitTicket() {
   const missing = [];
   if (!name)      missing.push('Nome');
   if (!email)     missing.push('E-mail');
+  if (!area)      missing.push('Área');
+  if (!tipo)      missing.push('Tipo de demanda');
+  if (!entrada)   missing.push('Tipo de entrada');
   if (!title)     missing.push('Título');
   if (!category)  missing.push('Categoria');
   if (!desc)      missing.push('Descrição');
@@ -2482,12 +2573,15 @@ async function submitTicket() {
   // Nota: attachmentLines será preenchido após converter arquivos
 
   // Payload enviado ao Worker
+  const isService = SERVICE_TYPES.includes(tipo);
+  const typeTag = isService ? '[Serviço]' : '[Chamado]';
+
   const payload = {
     board_id:    BOARD_ID,
-    title:       `[${category}] ${title}` + (ticketRef ? ` — Ref: ${ticketRef}` : ''),
+    title:       `${typeTag}[${area}] ${title}` + (ticketRef ? ` — Ref: ${ticketRef}` : ''),
     description: '',
     priority:    priorityMap[priority] || 'Medium',
-    tags:        [category, area].filter(Boolean),
+    tags:        [tipo, entrada, category, area].filter(Boolean),
     squad:       squad       || undefined,
     application: application || undefined,
     attachments: [],
@@ -2498,7 +2592,9 @@ async function submitTicket() {
   const infoRows = [
     ['👤', 'Solicitante', name],
     ['📧', 'E-mail',      email],
-    ['🏢', 'Área',        area || 'Não informado'],
+    ['🏢', 'Área',        area],
+    ['🗂️', 'Tipo',        tipo],
+    ['📥', 'Entrada',     entrada],
     ['📞', 'Contato',     phone || 'Não informado'],
     ['🏷️', 'Categoria',   category],
     ...(squad       ? [['👥', 'Squad',       squad]]       : []),
@@ -2825,6 +2921,8 @@ async function searchByTicketId() {
       loadCardCommentsInline(r.card.card_id || r.card.id || r.id);
     }
   });
+  showTrackFilters(found.length > 1);
+  applyTicketFilters();
 }
 
 async function searchTickets() {
@@ -2858,6 +2956,8 @@ async function searchTickets() {
       list.appendChild(el);
       if (idx === 0) loadCardCommentsInline(card.card_id || card.id);
     });
+    showTrackFilters(cards.length > 1);
+    applyTicketFilters();
   } catch(err) {
     document.getElementById('btn-search').disabled = false;
     list.innerHTML = '';
@@ -3156,6 +3256,28 @@ function renderDemoTickets(email, container) {
 ═══════════════════════════════════════════════════ */
 const API_KEY  = 'gs4giXuqZ8e43KpB9HDLAf5JHgVK31QFas9bzNwi';
 const BOARD_ID = 95;
+
+// ── Modelo Zendesk: áreas e tipos ──
+const AREAS = ['Atendimento','Pré Venda','Financeiro','Comercial','Logística','Produto','TI / Infraestrutura','RH'];
+// Tipos que são tratados como SERVIÇO (vão para a aba Serviços); os demais são Chamados
+const SERVICE_TYPES = ['Solicitação de Serviço'];
+
+function onTipoChange() {
+  const tipo = document.getElementById('f-tipo').value;
+  // Dica visual quando é serviço
+  const hint = document.getElementById('tipo-hint');
+  if (hint) {
+    if (SERVICE_TYPES.includes(tipo)) {
+      hint.textContent = '🔧 Esta demanda será registrada como Serviço.';
+      hint.style.display = 'block';
+    } else if (tipo) {
+      hint.textContent = '📋 Esta demanda será registrada como Chamado.';
+      hint.style.display = 'block';
+    } else {
+      hint.style.display = 'none';
+    }
+  }
+}
 let   resolvedLaneId   = null;
 let   resolvedColumnId = null;
 

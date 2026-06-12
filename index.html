@@ -1761,7 +1761,7 @@ function dashFilterEntry(entry) {
   }, 200);
 }
 
-// Relatório visual de entradas por canal (barras)
+// Relatório visual de entradas por canal (gráfico de rosca/donut)
 function renderEntryReport(cards) {
   const container = document.getElementById('entry-report');
   if (!container) return;
@@ -1773,19 +1773,47 @@ function renderEntryReport(cards) {
   const colors = { 'WhatsApp':'#25d366', 'E-mail':'#3b82f6', 'Atendimento telefônico':'#f59e0b', 'Acionamento direto':'#8b5cf6', 'Outros':'#94a3b8' };
   const icons  = { 'WhatsApp':'💬', 'E-mail':'📧', 'Atendimento telefônico':'📞', 'Acionamento direto':'➡️', 'Outros':'📋' };
 
-  container.innerHTML = Object.entries(entries).map(([label, count]) => {
+  // Filtra só canais com pelo menos 1 chamado para o gráfico
+  const data = Object.entries(entries).filter(([,n]) => n > 0);
+
+  // Monta os segmentos do donut
+  const R = 70, C = 2 * Math.PI * R;
+  let offset = 0;
+  const segments = data.map(([label, count]) => {
+    const frac = count / total;
+    const len = frac * C;
+    const seg = `<circle cx="90" cy="90" r="${R}" fill="none" stroke="${colors[label]}" stroke-width="28"
+      stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-offset}"
+      transform="rotate(-90 90 90)" style="transition:stroke-dasharray .6s ease"></circle>`;
+    offset += len;
+    return seg;
+  }).join('');
+
+  const donut = data.length > 0
+    ? `<svg viewBox="0 0 180 180" style="width:180px;height:180px;flex-shrink:0">
+        <circle cx="90" cy="90" r="${R}" fill="none" stroke="#f0f0f0" stroke-width="28"></circle>
+        ${segments}
+        <text x="90" y="84" text-anchor="middle" font-size="30" font-weight="800" fill="#1a1a1a" font-family="Inter,sans-serif">${cards.length}</text>
+        <text x="90" y="104" text-anchor="middle" font-size="11" fill="#999" font-family="Inter,sans-serif">chamados</text>
+      </svg>`
+    : '<div style="width:180px;height:180px;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:13px;flex-shrink:0">Sem dados</div>';
+
+  // Legenda
+  const legend = Object.entries(entries).map(([label, count]) => {
     const pct = Math.round((count/total)*100);
     const color = colors[label];
-    return `<div style="margin-bottom:.85rem">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <span style="font-size:13px;color:#333;display:flex;align-items:center;gap:6px">${icons[label]} ${label}</span>
-        <span style="font-size:12px;color:#888"><strong style="color:#333">${count}</strong> · ${pct}%</span>
-      </div>
-      <div style="height:8px;background:#f0f0f0;border-radius:5px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:${color};border-radius:5px;transition:width .5s ease"></div>
-      </div>
+    return `<div style="display:flex;align-items:center;gap:8px;padding:.45rem 0">
+      <span style="width:11px;height:11px;border-radius:3px;background:${color};flex-shrink:0"></span>
+      <span style="font-size:13px;color:#333;flex:1">${icons[label]} ${label}</span>
+      <span style="font-size:12px;color:#888"><strong style="color:#333">${count}</strong> · ${pct}%</span>
     </div>`;
-  }).join('') + `<div style="margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--border);font-size:12px;color:#888;text-align:center">Total de <strong style="color:#333">${cards.length}</strong> chamado(s) no board</div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;justify-content:center">
+      ${donut}
+      <div style="flex:1;min-width:200px">${legend}</div>
+    </div>`;
 }
 
 function goToCard(cardId) {

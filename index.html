@@ -60,7 +60,7 @@ main{flex:1;padding:1.5rem 2rem 2rem;display:flex;justify-content:center;margin-
 /* Telas de formulário/consulta ficam mais estreitas e centralizadas */
 #tab-form,#tab-track{max-width:720px;margin:0 auto}
 /* Telas de portal usam a largura total disponível */
-#tab-home,#tab-kb,#tab-services{max-width:1100px;margin:0 auto}
+#tab-home,#tab-kb,#tab-services,#tab-incidents{max-width:1100px;margin:0 auto}
 
 /* SIDEBAR RECOLHIDA */
 body.sidebar-collapsed #sidebar{width:62px}
@@ -310,6 +310,7 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
   .search-row{flex-direction:column}
   .kanban-track .kt-label{display:none}
   #tab-home > div{grid-template-columns:1fr !important}
+  #inc-reports > div{grid-template-columns:1fr !important}
 }
 </style>
 </head>
@@ -657,6 +658,13 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
       onmouseover="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='rgba(255,255,255,.06)'" onmouseout="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='transparent'">
       <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       <span class="btn-text">Meus Atendimentos</span>
+    </button>
+
+    <button id="tab-btn-incidents" onclick="switchTab('incidents')"
+      style="width:100%;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.55);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;margin-bottom:3px;transition:all .2s"
+      onmouseover="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='rgba(255,255,255,.06)'" onmouseout="if(this.style.color!=='rgb(255, 122, 80)')this.style.background='transparent'">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span class="btn-text">Incidentes N3</span>
     </button>
 
     <button id="tab-btn-kb" onclick="switchTab('kb')"
@@ -1246,6 +1254,30 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
               <div style="font-size:12px;color:var(--text-3);line-height:1.5">Solicite ambiente, acesso e setup</div>
             </div>
           </div>
+
+          <!-- ── VISUALIZAÇÕES (estilo Zendesk) ── -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:1.5rem;overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border)">
+              <h3 style="font-size:15px;font-weight:700">Visualizações</h3>
+              <button onclick="loadDashboard()" title="Atualizar" style="background:none;border:none;cursor:pointer;color:#888;padding:4px;border-radius:6px" onmouseover="this.style.color='#E84E1B'" onmouseout="this.style.color='#888'">
+                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              </button>
+            </div>
+            <div id="zendesk-views" style="padding:.5rem 0">
+              <div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px"><div class="spinner-dark" style="margin:0 auto .75rem"></div>Carregando visualizações...</div>
+            </div>
+          </div>
+
+          <!-- ── RELATÓRIO POR TIPO DE ENTRADA ── -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:1.25rem;overflow:hidden">
+            <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border)">
+              <h3 style="font-size:15px;font-weight:700">Entradas por canal</h3>
+              <p style="font-size:12px;color:var(--text-3);margin-top:2px">Distribuição dos chamados por tipo de entrada</p>
+            </div>
+            <div id="entry-report" style="padding:1.25rem">
+              <div style="text-align:center;color:var(--text-3);font-size:13px">Carregando...</div>
+            </div>
+          </div>
         </div>
 
         <!-- Dashboard lateral -->
@@ -1369,6 +1401,63 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
       </div>
     </div><!-- /tab-services -->
 
+    <!-- ═══════════════════════════════════════
+         TAB: INCIDENTES N3 (board #26)
+    ════════════════════════════════════════ -->
+    <div id="tab-incidents" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:1.25rem">
+        <div>
+          <h2 style="font-size:17px;font-weight:700;margin-bottom:.25rem">Incidentes N3</h2>
+          <p style="font-size:13px;color:var(--text-3)">Squad Atendimento N3 · Workflow de Incidentes</p>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div style="position:relative">
+            <svg viewBox="0 0 24 24" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;fill:none;stroke:#aaa;stroke-width:2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="inc-search" placeholder="Buscar incidente, #ID, cliente..." oninput="renderIncidents()"
+              style="padding:7px 10px 7px 28px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;width:220px"
+              onfocus="this.style.borderColor='#E84E1B'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <button onclick="loadIncidents()" style="padding:7px 11px;background:#f5f5f5;border:1px solid var(--border);border-radius:8px;font-size:12px;color:#555;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Atualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- MÉTRICAS -->
+      <div id="inc-metrics" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.85rem;margin-bottom:1.25rem"></div>
+
+      <!-- SUB-ABAS: Lista / Relatórios -->
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.25rem">
+        <button id="inc-view-list" onclick="switchIncView('list')"
+          style="padding:.6rem 1.1rem;font-size:13px;font-weight:600;border:none;background:transparent;cursor:pointer;color:#E84E1B;border-bottom:2px solid #E84E1B;margin-bottom:-2px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Lista
+        </button>
+        <button id="inc-view-reports" onclick="switchIncView('reports')"
+          style="padding:.6rem 1.1rem;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg>
+          Relatórios
+        </button>
+      </div>
+
+      <!-- LOADING -->
+      <div id="inc-loading" style="text-align:center;padding:3rem;color:var(--text-3)">
+        <div class="spinner-dark" style="margin:0 auto 1rem"></div>
+        <p style="font-size:13px">Carregando incidentes...</p>
+      </div>
+
+      <!-- LISTA -->
+      <div id="inc-list-view" style="display:none">
+        <div id="inc-list"></div>
+      </div>
+
+      <!-- RELATÓRIOS -->
+      <div id="inc-reports-view" style="display:none">
+        <div id="inc-reports"></div>
+      </div>
+    </div><!-- /tab-incidents -->
+
   </div><!-- /form-wrapper -->
 </main>
 
@@ -1472,7 +1561,7 @@ function toggleSidebar() {
 })();
 
 function switchTab(t) {
-  const tabs = ['home','form','track','kb','services'];
+  const tabs = ['home','form','track','kb','services','incidents'];
   tabs.forEach(tab => {
     const el = document.getElementById('tab-' + tab);
     if (el) el.style.display = tab === t ? 'block' : 'none';
@@ -1501,6 +1590,7 @@ function switchTab(t) {
   if (t === 'form')     prefillTemplate();
   if (t === 'kb')       initKb();
   if (t === 'services') renderServicesStatus();
+  if (t === 'incidents') loadIncidents();
   if (t === 'track')    initTrackFilters();
 }
 
@@ -1555,12 +1645,17 @@ async function loadDashboard() {
   if (!workerUrl) {
     setEl('dash-total','—'); setEl('dash-progress','—'); setEl('dash-done','—');
     if (alerts) alerts.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:.5rem .75rem;background:#f8f8f8;border-radius:8px">Configure a integração para ver métricas.</div>';
+    const zv = document.getElementById('zendesk-views');
+    const er = document.getElementById('entry-report');
+    if (zv) zv.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-3);font-size:13px">Configure a integração para ver as visualizações.</div>';
+    if (er) er.innerHTML = '<div style="text-align:center;color:var(--text-3);font-size:13px">Configure a integração para ver o relatório.</div>';
     return;
   }
 
   try {
     const result = await callFlow(workerUrl, { board_id: BOARD_ID }, 'search_cards');
-    const cards = result.data?.cards || [];
+    const raw = result.data?.cards || result.data?.data?.cards || result.data?.data || result.data || [];
+    const cards = Array.isArray(raw) ? raw : [];
 
     const total    = cards.length;
     const progress = cards.filter(c => (c.column_name||'').toLowerCase().includes('progress')).length;
@@ -1583,10 +1678,114 @@ async function loadDashboard() {
         ).join('');
       }
     }
-  } catch {
+
+    // Renderiza visualizações estilo Zendesk + relatório de entradas
+    renderZendeskViews(cards);
+    renderEntryReport(cards);
+  } catch(e) {
+    console.warn('Dashboard error:', e);
     setEl('dash-total','—'); setEl('dash-progress','—'); setEl('dash-done','—');
     if (alerts) alerts.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:.5rem .75rem;background:#f8f8f8;border-radius:8px">Não foi possível carregar.</div>';
+    const zv = document.getElementById('zendesk-views');
+    const er = document.getElementById('entry-report');
+    if (zv) zv.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;font-size:13px">Erro ao carregar. <button onclick="loadDashboard()" style="color:#E84E1B;background:none;border:none;cursor:pointer;font-weight:600">Tentar novamente</button></div>';
+    if (er) er.innerHTML = '<div style="text-align:center;color:#dc2626;font-size:13px">Erro ao carregar.</div>';
   }
+}
+
+// Detecta o tipo de entrada de um card (pela tag/descrição)
+function detectEntry(card) {
+  const tagsStr = Array.isArray(card.tags) ? card.tags.join(' ') : (card.tags || '');
+  const txt = ((card.title||'') + ' ' + (card.description||'') + ' ' + tagsStr).toLowerCase();
+  if (txt.includes('whatsapp')) return 'WhatsApp';
+  if (txt.includes('e-mail') || txt.includes('email')) return 'E-mail';
+  if (txt.includes('telefôn') || txt.includes('telefon') || txt.includes('ligaç') || txt.includes('ligac')) return 'Atendimento telefônico';
+  if (txt.includes('acionamento direto')) return 'Acionamento direto';
+  return 'Outros';
+}
+
+// Visualizações estilo Zendesk: tipo de entrada + filas/status
+function renderZendeskViews(cards) {
+  const container = document.getElementById('zendesk-views');
+  if (!container) return;
+
+  // Conta por tipo de entrada
+  const entries = { 'E-mail':0, 'WhatsApp':0, 'Atendimento telefônico':0, 'Acionamento direto':0, 'Outros':0 };
+  cards.forEach(c => { const e = detectEntry(c); entries[e] = (entries[e]||0)+1; });
+
+  // Conta por status/coluna
+  const statusCount = {};
+  cards.forEach(c => {
+    const col = c.column_name || c.column || 'Sem status';
+    statusCount[col] = (statusCount[col]||0)+1;
+  });
+
+  const row = (icon, label, count, onclick, indent) =>
+    `<div onclick="${onclick||''}" style="display:flex;align-items:center;justify-content:space-between;padding:.6rem ${indent?'1.25rem .6rem 2.5rem':'1.25rem'};cursor:${onclick?'pointer':'default'};border-bottom:1px solid #f5f5f5" ${onclick?`onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''"`:''}>
+      <span style="font-size:13.5px;color:#333;display:flex;align-items:center;gap:8px">${icon} ${label}</span>
+      <span style="font-size:13px;font-weight:700;color:#555">${count}</span>
+    </div>`;
+
+  const total = cards.length;
+
+  container.innerHTML =
+    row('⭐', '<strong>Meus Tickets</strong>', total, "switchTab('track')") +
+    row('📧', 'E-mail', entries['E-mail'], "dashFilterEntry('E-mail')", true) +
+    row('💬', 'WhatsApp', entries['WhatsApp'], "dashFilterEntry('WhatsApp')", true) +
+    row('📞', 'Ligações', entries['Atendimento telefônico'], "dashFilterEntry('Atendimento telefônico')", true) +
+    row('➡️', 'Acionamento direto', entries['Acionamento direto'], "dashFilterEntry('Acionamento direto')", true) +
+    `<div style="height:6px"></div>` +
+    `<div style="padding:.4rem 1.25rem;font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.06em">Por status / fila</div>` +
+    Object.entries(statusCount).sort((a,b)=>b[1]-a[1]).map(([col,n]) => {
+      const dot = statusDot(col);
+      return row(dot, col, n, null, true);
+    }).join('');
+}
+
+// Bolinha colorida por status (estilo Zendesk)
+function statusDot(col) {
+  const c = (col||'').toLowerCase();
+  if (c.includes('done') || c.includes('conclu')) return '🟢';
+  if (c.includes('progress') || c.includes('tratativa')) return '🔴';
+  if (c.includes('request') || c.includes('direcion')) return '🟡';
+  if (c.includes('test') || c.includes('homolog')) return '🔵';
+  if (c.includes('backlog') || c.includes('triagem')) return '⚪';
+  return '⚫';
+}
+
+function dashFilterEntry(entry) {
+  switchTab('track');
+  // Pequeno delay e abre a busca por nome trazendo tudo, depois filtra visualmente
+  setTimeout(() => {
+    showTrackMsg('Filtrando entradas do tipo: ' + entry + ' — use a busca para carregar os chamados.', 'info');
+  }, 200);
+}
+
+// Relatório visual de entradas por canal (barras)
+function renderEntryReport(cards) {
+  const container = document.getElementById('entry-report');
+  if (!container) return;
+
+  const entries = { 'WhatsApp':0, 'E-mail':0, 'Atendimento telefônico':0, 'Acionamento direto':0, 'Outros':0 };
+  cards.forEach(c => { const e = detectEntry(c); entries[e] = (entries[e]||0)+1; });
+
+  const total = cards.length || 1;
+  const colors = { 'WhatsApp':'#25d366', 'E-mail':'#3b82f6', 'Atendimento telefônico':'#f59e0b', 'Acionamento direto':'#8b5cf6', 'Outros':'#94a3b8' };
+  const icons  = { 'WhatsApp':'💬', 'E-mail':'📧', 'Atendimento telefônico':'📞', 'Acionamento direto':'➡️', 'Outros':'📋' };
+
+  container.innerHTML = Object.entries(entries).map(([label, count]) => {
+    const pct = Math.round((count/total)*100);
+    const color = colors[label];
+    return `<div style="margin-bottom:.85rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:13px;color:#333;display:flex;align-items:center;gap:6px">${icons[label]} ${label}</span>
+        <span style="font-size:12px;color:#888"><strong style="color:#333">${count}</strong> · ${pct}%</span>
+      </div>
+      <div style="height:8px;background:#f0f0f0;border-radius:5px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:5px;transition:width .5s ease"></div>
+      </div>
+    </div>`;
+  }).join('') + `<div style="margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--border);font-size:12px;color:#888;text-align:center">Total de <strong style="color:#333">${cards.length}</strong> chamado(s) no board</div>`;
 }
 
 function goToCard(cardId) {
@@ -1596,6 +1795,258 @@ function goToCard(cardId) {
     const inp = document.getElementById('track-ticket-id');
     if (inp) { inp.value = cardId; searchByTicketId(); }
   }, 200);
+}
+
+// ═══════════════════════════════════════════════════
+// INCIDENTES N3 (board #26)
+// ═══════════════════════════════════════════════════
+const INCIDENTS_BOARD_ID = 26;
+const INC_COLUMNS = [
+  { key:'Backlog Incidente',          label:'Backlog',          color:'#6366f1' },
+  { key:'Incidente Aberto',           label:'Aberto',           color:'#3b82f6' },
+  { key:'Incidente em Análise',       label:'Em Análise',       color:'#f59e0b' },
+  { key:'Incidente em Correção',      label:'Em Correção',      color:'#f97316' },
+  { key:'Incidente em Publicação QA', label:'Publicação QA',    color:'#06b6d4' },
+  { key:'Incidente em Testes',        label:'Em Testes',        color:'#8b5cf6' },
+  { key:'Incidente em Publicação PROD', label:'Publicação PROD', color:'#ec4899' },
+  { key:'Incidente Resolvido',        label:'Resolvido',        color:'#16a34a' },
+  { key:'Incidente Cancelado',        label:'Cancelado',        color:'#94a3b8' },
+];
+let incCards = [];
+let incView = 'list';
+
+function switchIncView(view) {
+  incView = view;
+  const isList = view === 'list';
+  document.getElementById('inc-list-view').style.display    = isList ? 'block' : 'none';
+  document.getElementById('inc-reports-view').style.display = isList ? 'none' : 'block';
+
+  const lBtn = document.getElementById('inc-view-list');
+  const rBtn = document.getElementById('inc-view-reports');
+  [[lBtn,isList],[rBtn,!isList]].forEach(([btn,active]) => {
+    if (!btn) return;
+    btn.style.color = active ? '#E84E1B' : '#888';
+    btn.style.borderBottomColor = active ? '#E84E1B' : 'transparent';
+    btn.style.fontWeight = active ? '600' : '500';
+  });
+  renderIncidents();
+}
+
+async function loadIncidents() {
+  const workerUrl = localStorage.getItem('pa_create_url') || '';
+  const loading = document.getElementById('inc-loading');
+  if (loading) loading.style.display = 'block';
+  document.getElementById('inc-list-view').style.display = 'none';
+  document.getElementById('inc-reports-view').style.display = 'none';
+
+  if (!workerUrl) {
+    if (loading) loading.innerHTML = '<p style="font-size:13px;color:var(--text-3)">Configure a integração para ver os incidentes.</p>';
+    return;
+  }
+
+  try {
+    const result = await callFlow(workerUrl, { board_id: INCIDENTS_BOARD_ID }, 'search_cards');
+    incCards = result.data?.cards || [];
+    if (loading) loading.style.display = 'none';
+    renderIncMetrics();
+    switchIncView(incView);
+  } catch(e) {
+    if (loading) loading.innerHTML = '<p style="font-size:13px;color:#dc2626">Erro ao carregar incidentes. <button onclick="loadIncidents()" style="color:#E84E1B;background:none;border:none;cursor:pointer;font-weight:600">Tentar novamente</button></p>';
+  }
+}
+
+function incFilterCards() {
+  const search = (document.getElementById('inc-search')?.value || '').toLowerCase().trim();
+  if (!search) return incCards;
+  return incCards.filter(c => {
+    const txt = ((c.title||'') + ' ' + (c.description||'') + ' ' + String(c.card_id||c.id||'') + ' ' + (c.owner_user_name||'')).toLowerCase();
+    return txt.includes(search.replace('#',''));
+  });
+}
+
+function renderIncMetrics() {
+  const container = document.getElementById('inc-metrics');
+  if (!container) return;
+
+  const total     = incCards.length;
+  const resolved  = incCards.filter(c => (c.column_name||'').toLowerCase().includes('resolv')).length;
+  const analysis  = incCards.filter(c => (c.column_name||'').toLowerCase().includes('análise') || (c.column_name||'').toLowerCase().includes('analise')).length;
+  const critical  = incCards.filter(c => ((c.description||'')+(c.title||'')).match(/S1|crítica|critica/i)).length;
+  const open      = total - resolved - incCards.filter(c => (c.column_name||'').toLowerCase().includes('cancel')).length;
+
+  const metric = (label, value, color, bg) =>
+    `<div style="background:${bg};border-radius:12px;padding:1rem 1.1rem">
+      <div style="font-size:26px;font-weight:800;color:${color};line-height:1">${value}</div>
+      <div style="font-size:12px;color:#666;margin-top:4px;font-weight:500">${label}</div>
+    </div>`;
+
+  container.innerHTML =
+    metric('Total de incidentes', total, '#1a1a1a', '#f5f6f8') +
+    metric('Em aberto', open, '#E84E1B', '#fff0eb') +
+    metric('Em análise', analysis, '#f59e0b', '#fef3c7') +
+    metric('Severidade S1', critical, '#dc2626', '#fef2f2') +
+    metric('Resolvidos', resolved, '#16a34a', '#dcfce7');
+}
+
+function renderIncidents() {
+  if (incView === 'reports') renderIncReports();
+  else renderIncList();
+}
+
+function findIncColumn(colName) {
+  const col = (colName||'').toLowerCase();
+  return INC_COLUMNS.find(c => col.includes(c.key.toLowerCase()) || c.key.toLowerCase().includes(col)) || INC_COLUMNS[0];
+}
+
+function severityBadge(card) {
+  const txt = ((card.description||'')+' '+(card.title||''));
+  const m = txt.match(/S(\d)\s*[-–]?\s*(Crítica|Critica|Grave|Moderada|Baixa)?/i);
+  if (!m) return '';
+  const sev = 'S' + m[1];
+  const colors = { 'S1':'#dc2626','S2':'#f97316','S3':'#f59e0b','S4':'#16a34a' };
+  const c = colors[sev] || '#94a3b8';
+  return `<span style="font-size:9px;font-weight:700;color:${c};background:${c}1a;padding:1px 6px;border-radius:6px">${sev}</span>`;
+}
+
+function extractField(card, field) {
+  const desc = card.description || '';
+  const re = new RegExp(field + '[:\\s]*([^<\\n]+)', 'i');
+  const m = desc.match(re);
+  return m ? m[1].trim().substring(0,30) : '';
+}
+
+function renderIncReports() {
+  const cards = incFilterCards();
+  const container = document.getElementById('inc-reports');
+  if (!container) return;
+
+  if (cards.length === 0) {
+    container.innerHTML = '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:2.5rem;text-align:center;color:var(--text-3);font-size:13px">Nenhum incidente para gerar relatórios.</div>';
+    return;
+  }
+
+  // 1) Distribuição por status
+  const byStatus = {};
+  INC_COLUMNS.forEach(c => byStatus[c.label] = { count:0, color:c.color });
+  cards.forEach(card => {
+    const col = findIncColumn(card.column_name||card.column||'');
+    if (byStatus[col.label]) byStatus[col.label].count++;
+  });
+
+  // 2) Distribuição por severidade
+  const sevCount = { S1:0, S2:0, S3:0, S4:0, 'Sem severidade':0 };
+  const sevColors = { S1:'#dc2626', S2:'#f97316', S3:'#f59e0b', S4:'#16a34a', 'Sem severidade':'#94a3b8' };
+  cards.forEach(card => {
+    const m = ((card.description||'')+' '+(card.title||'')).match(/S([1-4])/i);
+    if (m) sevCount['S'+m[1]]++;
+    else sevCount['Sem severidade']++;
+  });
+
+  // 3) Top clientes
+  const clientCount = {};
+  cards.forEach(card => {
+    const cl = extractField(card, 'Cliente') || 'Não informado';
+    clientCount[cl] = (clientCount[cl]||0)+1;
+  });
+  const topClients = Object.entries(clientCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  // 4) Por responsável
+  const ownerCount = {};
+  cards.forEach(card => {
+    const o = card.owner_user_name || 'Não atribuído';
+    ownerCount[o] = (ownerCount[o]||0)+1;
+  });
+  const topOwners = Object.entries(ownerCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  const total = cards.length;
+
+  // Helper: barra horizontal
+  const bar = (label, count, color, max) => {
+    const pct = Math.round((count/max)*100);
+    return `<div style="margin-bottom:.7rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:12.5px;color:#333">${label}</span>
+        <span style="font-size:12px;color:#888"><strong style="color:#333">${count}</strong></span>
+      </div>
+      <div style="height:8px;background:#f0f0f0;border-radius:5px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:5px;transition:width .5s ease"></div>
+      </div>
+    </div>`;
+  };
+
+  const card = (title, body) =>
+    `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem">
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:1rem">${title}</h3>${body}
+    </div>`;
+
+  // Status — barras
+  const statusMax = Math.max(...Object.values(byStatus).map(s=>s.count), 1);
+  const statusBody = Object.entries(byStatus).filter(([,v])=>v.count>0)
+    .map(([label,v]) => bar(label, v.count, v.color, statusMax)).join('') || '<p style="font-size:12px;color:#aaa">Sem dados</p>';
+
+  // Severidade — donut simples (barras)
+  const sevMax = Math.max(...Object.values(sevCount), 1);
+  const sevBody = Object.entries(sevCount).filter(([,v])=>v>0)
+    .map(([label,v]) => bar(label, v, sevColors[label], sevMax)).join('') || '<p style="font-size:12px;color:#aaa">Sem dados</p>';
+
+  // Clientes
+  const clientMax = topClients.length ? topClients[0][1] : 1;
+  const clientBody = topClients.map(([label,n]) => bar(label, n, '#3b82f6', clientMax)).join('') || '<p style="font-size:12px;color:#aaa">Sem dados</p>';
+
+  // Responsáveis
+  const ownerMax = topOwners.length ? topOwners[0][1] : 1;
+  const ownerBody = topOwners.map(([label,n]) => bar(label, n, '#8b5cf6', ownerMax)).join('') || '<p style="font-size:12px;color:#aaa">Sem dados</p>';
+
+  // Resumo de severidade em destaque
+  const sevSummary = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem">
+    ${['S1','S2','S3','S4'].map(s => `<div style="text-align:center;background:${sevColors[s]}1a;border-radius:10px;padding:.7rem .3rem">
+      <div style="font-size:22px;font-weight:800;color:${sevColors[s]}">${sevCount[s]}</div>
+      <div style="font-size:10px;color:#666;font-weight:600">${s}</div>
+    </div>`).join('')}
+  </div>`;
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+      ${card('📊 Incidentes por status', statusBody)}
+      ${card('🚨 Por severidade', sevSummary + sevBody)}
+      ${card('🏢 Top clientes afetados', clientBody)}
+      ${card('👤 Por responsável', ownerBody)}
+    </div>
+    <div style="text-align:center;font-size:12px;color:#aaa;margin-top:1rem">Relatório gerado com ${total} incidente(s) · ${new Date().toLocaleString('pt-BR')}</div>`;
+}
+
+function renderIncList() {
+  const cards = incFilterCards();
+  const container = document.getElementById('inc-list');
+  if (!container) return;
+
+  if (cards.length === 0) {
+    container.innerHTML = '<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:2.5rem;text-align:center;color:var(--text-3);font-size:13px">Nenhum incidente encontrado.</div>';
+    return;
+  }
+
+  cards.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+
+  container.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden">${cards.map((card,i)=>{
+    const cardId = card.card_id || card.id;
+    const col = findIncColumn(card.column_name||card.column||'');
+    const client = extractField(card, 'Cliente');
+    return `<div onclick="goToIncident(${cardId})" style="display:flex;align-items:center;gap:12px;padding:.85rem 1.1rem;cursor:pointer;${i>0?'border-top:1px solid var(--border)':''}" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+      <span style="font-size:11px;font-weight:700;color:#E84E1B;background:#fff0eb;padding:3px 9px;border-radius:8px;flex-shrink:0">#${cardId}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${card.title||'(sem título)'}</div>
+        <div style="font-size:12px;color:var(--text-3)">${client?'🏢 '+client+' · ':''}${card.owner_user_name||'Não atribuído'}</div>
+      </div>
+      ${severityBadge(card)}
+      <span style="font-size:11px;font-weight:600;color:${col.color};background:${col.color}1a;padding:3px 10px;border-radius:10px;flex-shrink:0;white-space:nowrap">${col.label}</span>
+    </div>`;
+  }).join('')}</div>
+  <div style="text-align:right;font-size:12px;color:#aaa;margin-top:.6rem">${cards.length} incidente(s)</div>`;
+}
+
+// Abre o incidente no board (não usa o chat de chamados pois é outro board)
+function goToIncident(cardId) {
+  window.open('https://stradaz3.businessmap.io/ctrl_board/26/cards/' + cardId + '/details/', '_blank');
 }
 
 // ═══════════════════════════════════════════════════

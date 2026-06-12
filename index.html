@@ -991,8 +991,15 @@ footer{background:#E84E1B;padding:.85rem 2.5rem;text-align:center;font-size:12px
               </div>
             </div>
             <div class="field">
-              <label>Descrição detalhada <span class="req">*</span></label>
-              <textarea id="f-desc" rows="4" placeholder="Descreva o que aconteceu, quando e como reproduzir. Quanto mais detalhes, mais rápido o atendimento."></textarea>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+                <label style="margin-bottom:0">Descrição detalhada <span class="req">*</span></label>
+                <button type="button" onclick="insertTemplate()" style="font-size:11px;font-weight:600;color:#E84E1B;background:#fff0eb;border:1px solid #fcd9c8;border-radius:7px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:5px">
+                  <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Inserir template
+                </button>
+              </div>
+              <textarea id="f-desc" rows="14" style="font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.6" placeholder="Preencha o template ou descreva o que aconteceu, quando e como reproduzir."></textarea>
+              <p style="font-size:11px;color:var(--text-3);margin-top:5px">💡 O template do N3 já vem preenchido — basta editar os campos. Para começar do zero, apague o conteúdo.</p>
             </div>
           </div>
         </div>
@@ -1491,6 +1498,7 @@ function switchTab(t) {
 
   // Carrega dados sob demanda
   if (t === 'home')     loadDashboard();
+  if (t === 'form')     prefillTemplate();
   if (t === 'kb')       initKb();
   if (t === 'services') renderServicesStatus();
   if (t === 'track')    initTrackFilters();
@@ -2747,6 +2755,7 @@ function resetForm() {
   attachedFiles = [];
   selectPriority(document.querySelector('[data-p="medium"]'));
   setStep(1); setProgress(0);
+  prefillTemplate();
 }
 
 /* ═══════════════════════════════════════════════════
@@ -3256,6 +3265,43 @@ function renderDemoTickets(email, container) {
 ═══════════════════════════════════════════════════ */
 const API_KEY  = 'gs4giXuqZ8e43KpB9HDLAf5JHgVK31QFas9bzNwi';
 const BOARD_ID = 95;
+
+// ── Template padrão N3 ──
+const N3_TEMPLATE = `TEMPLATE DE REGISTRO DE INCIDENTE / SOLICITAÇÃO AO N3 TECH
+
+Célula de Atendimento:
+( ) Embarcador  ( ) Transportador  ( ) Motorista
+
+Produto:
+( ) Log  ( ) Frete  ( ) BID  ( ) App Motorista  ( ) App Strada Pay
+
+1) Necessidade do cliente:
+[Descreva aqui a necessidade do cliente]
+
+2) Mensagem de erro:
+Descrever completamente a mensagem apresentada.
+Em caso de print: anexar a tela completa, não apenas o erro.
+
+3) Passo a passo para reprodução:
+[Liste os passos para reproduzir o problema]
+`;
+
+function insertTemplate() {
+  const ta = document.getElementById('f-desc');
+  if (!ta) return;
+  if (ta.value.trim() && !confirm('Isso vai substituir o conteúdo atual. Continuar?')) return;
+  ta.value = N3_TEMPLATE;
+  ta.focus();
+  // Posiciona o cursor no primeiro campo a preencher
+  const pos = N3_TEMPLATE.indexOf('[Descreva aqui a necessidade do cliente]');
+  if (pos >= 0) ta.setSelectionRange(pos, pos + '[Descreva aqui a necessidade do cliente]'.length);
+}
+
+// Pré-preenche o template ao carregar a tela de chamado (se vazio)
+function prefillTemplate() {
+  const ta = document.getElementById('f-desc');
+  if (ta && !ta.value.trim()) ta.value = N3_TEMPLATE;
+}
 
 // ── Modelo Zendesk: áreas e tipos ──
 const AREAS = ['Atendimento','Pré Venda','Financeiro','Comercial','Logística','Produto','TI / Infraestrutura','RH'];
